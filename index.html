@@ -15,6 +15,28 @@
   <meta name="twitter:description" content="たった12の質問であなたの小説家適性がわかる。" />
   <meta name="twitter:image" content="ogp.png" />
   <meta name="theme-color" content="#0a0a1a" />
+
+  <!-- ========== Google Analytics ==========
+  以下の GA_MEASUREMENT_ID をあなたのIDに置き換えてください。
+  Google Analytics アカウント作成: https://analytics.google.com
+  -->
+  <!--
+  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'GA_MEASUREMENT_ID');
+  </script>
+  -->
+
+  <!-- ========== Google AdSense ==========
+  審査通過後、以下の YOUR_ADSENSE_ID をあなたのIDに置き換えて
+  コメントを外してください。
+  -->
+  <!--
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
+  -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@400;600;800&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
@@ -378,6 +400,55 @@
       );
     }
 
+    // ========== 広告スロット ==========
+    // 忍者AdMax または AdSense のコードをここに設置
+    function AdSlot(props) {
+      var slotId = props.id || 'ad-slot';
+      return (
+        <div id={slotId} style={{
+          width: '100%', minHeight: '100px', marginBottom: '1.5rem',
+          background: 'rgba(255,255,255,0.02)', borderRadius: '12px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '1px dashed rgba(255,255,255,0.06)', overflow: 'hidden',
+        }}>
+          {/* ここに広告コードを貼り付け */}
+          <span style={{ fontSize: '0.7rem', color: '#333' }}>AD</span>
+        </div>
+      );
+    }
+
+    // ========== おすすめ書籍（Amazonアソシエイト用） ==========
+    var BOOK_RECOMMENDATIONS = {
+      0: { title: '人間失格', author: '太宰治', url: 'https://www.amazon.co.jp/dp/B009GXMB0O' },
+      1: { title: '十角館の殺人', author: '綾辻行人', url: 'https://www.amazon.co.jp/dp/B009GXLWZQ' },
+      2: { title: '夜のピクニック', author: '恩田陸', url: 'https://www.amazon.co.jp/dp/B009GXMA2U' },
+      3: { title: 'ノルウェイの森', author: '村上春樹', url: 'https://www.amazon.co.jp/dp/B009GXMFPC' },
+      4: { title: '星新一 ショートショート傑作選', author: '星新一', url: 'https://www.amazon.co.jp/dp/B009GXMB0O' },
+    };
+
+    function BookRecommendation(props) {
+      var resultIndex = props.resultIndex;
+      var book = BOOK_RECOMMENDATIONS[resultIndex];
+      if (!book) return null;
+      return (
+        <a href={book.url} target="_blank" rel="noopener noreferrer nofollow" style={{
+          display: 'block', width: '100%', padding: '1rem 1.2rem', marginBottom: '1.5rem',
+          background: 'rgba(255,255,255,0.04)', borderRadius: '12px', textDecoration: 'none',
+          border: '1px solid rgba(255,255,255,0.08)', transition: 'all 0.2s',
+        }}>
+          <div style={{ fontSize: '0.7rem', color: '#FF6B35', letterSpacing: '2px', marginBottom: '0.5rem', fontWeight: 700 }}>
+            📚 あなたにおすすめの一冊
+          </div>
+          <div style={{ fontSize: '0.95rem', color: '#ddd', marginBottom: '0.3rem' }}>
+            {book.title}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#888' }}>
+            {book.author} ／ Amazon で見る →
+          </div>
+        </a>
+      );
+    }
+
     function ResultScreen(props) {
       var result = props.result;
       var onRetry = props.onRetry;
@@ -447,6 +518,13 @@
               <span style={{ color: '#999' }}>同じタイプの作家：</span>{result.writers}
             </div>
           </div>
+
+          {/* 広告スロット（結果カードの下 = 最も見られる位置） */}
+          <AdSlot id="ad-result" />
+
+          {/* おすすめ書籍（Amazonアソシエイト） */}
+          <BookRecommendation resultIndex={RESULTS.indexOf(result)} />
+
           <div style={{ display: 'flex', gap: '0.8rem', width: '100%', marginBottom: '1rem', animation: 'fadeInUp 0.8s ease-out 0.3s backwards' }}>
             <button onClick={handleShare} style={{
               flex: 1, background: '#1DA1F2', color: '#fff', border: 'none', padding: '0.9rem',
@@ -474,6 +552,26 @@
             ※ この診断はエンターテインメントです。<br />科学的根拠はありませんが、あなたの才能は本物です。
           </p>
         </div>
+      );
+    }
+
+    // ========== サイトフッター ==========
+    function SiteFooter() {
+      return (
+        <footer style={{
+          position: 'relative', zIndex: 1, padding: '2rem 1.5rem', textAlign: 'center',
+          borderTop: '1px solid rgba(255,255,255,0.05)', marginTop: '2rem',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+            <a href="article1.html" style={{ color: '#888', fontSize: '0.78rem', textDecoration: 'none' }}>小説家になるには</a>
+            <a href="article2.html" style={{ color: '#888', fontSize: '0.78rem', textDecoration: 'none' }}>小説の書き方</a>
+            <a href="privacy.html" style={{ color: '#888', fontSize: '0.78rem', textDecoration: 'none' }}>プライバシーポリシー</a>
+            <a href="contact.html" style={{ color: '#888', fontSize: '0.78rem', textDecoration: 'none' }}>お問い合わせ</a>
+          </div>
+          <p style={{ fontSize: '0.68rem', color: '#444' }}>
+            &copy; 2025 小説家適性診断
+          </p>
+        </footer>
       );
     }
 
@@ -510,6 +608,7 @@
             {screen === 'question' && <QuestionScreen question={QUESTIONS[currentQuestion]} questionIndex={currentQuestion} total={QUESTIONS.length} onAnswer={handleAnswer} />}
             {screen === 'result' && <ResultScreen result={result} onRetry={handleRetry} />}
           </div>
+          <SiteFooter />
         </div>
       );
     }
