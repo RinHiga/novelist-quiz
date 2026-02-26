@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>あなたは小説家に向いているか診断</title>
+  <meta name="description" content="たった12の質問で、あなたの中に眠る物語を紡ぐ才能を診断します。" />
+  <meta property="og:title" content="あなたは小説家に向いているか診断" />
+  <meta property="og:description" content="たった12の質問で、あなたの中に眠る物語を紡ぐ才能を科学的(?)に診断。" />
+  <meta property="og:image" content="ogp.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="ja_JP" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="あなたは小説家に向いているか診断" />
+  <meta name="twitter:description" content="たった12の質問であなたの小説家適性がわかる。" />
+  <meta name="twitter:image" content="ogp.png" />
+  <meta name="theme-color" content="#0a0a1a" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@400;600;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a1a;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      color: #e8e8f0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; }
+      50% { opacity: 1; }
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(255,107,53,0.3); }
+      50% { box-shadow: 0 0 40px rgba(255,107,53,0.6); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes resultReveal {
+      0% { opacity: 0; transform: scale(0.8) rotate(-2deg); }
+      60% { transform: scale(1.05) rotate(1deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+
+    const QUESTIONS = [
+      {
+        id: 1, text: "\u96FB\u8ECA\u306E\u4E2D\u3067\u96A3\u306E\u4EBA\u306E\u4F1A\u8A71\u304C\u805E\u3053\u3048\u3066\u304D\u305F\u3002\u3042\u306A\u305F\u306F\uFF1F",
+        options: [
+          { text: "\u52DD\u624B\u306B\u305D\u306E\u4EBA\u305F\u3061\u306E\u4EBA\u751F\u306E\u80CC\u666F\u3092\u60F3\u50CF\u3057\u59CB\u3081\u308B", score: [3,0,3,1,3] },
+          { text: "\u9762\u767D\u3044\u30D5\u30EC\u30FC\u30BA\u304C\u3042\u308C\u3070\u3053\u3063\u305D\u308A\u30E1\u30E2\u3059\u308B", score: [2,2,2,0,1] },
+          { text: "\u30A4\u30E4\u30DB\u30F3\u3092\u3057\u3066\u81EA\u5206\u306E\u4E16\u754C\u306B\u5165\u308B", score: [1,1,0,2,2] },
+          { text: "\u7279\u306B\u6C17\u306B\u3057\u306A\u3044", score: [0,1,0,0,0] },
+        ],
+      },
+      {
+        id: 2, text: "\u6DF1\u591C3\u6642\u3001\u7A81\u7136\u3059\u3054\u3044\u30A2\u30A4\u30C7\u30A2\u304C\u6D6E\u304B\u3093\u3060\u3002\u3069\u3046\u3059\u308B\uFF1F",
+        options: [
+          { text: "\u98DB\u3073\u8D77\u304D\u3066\u30B9\u30DE\u30DB\u306B\u30E1\u30E2\u3059\u308B", score: [3,1,1,2,2] },
+          { text: "\u671D\u8D77\u304D\u305F\u3089\u899A\u3048\u3066\u308B\u3060\u308D\u3046\u3068\u601D\u3063\u3066\u5BDD\u308B\uFF08\u899A\u3048\u3066\u306A\u3044\uFF09", score: [1,0,0,1,2] },
+          { text: "\u305D\u306E\u307E\u307E\u8208\u596E\u3057\u3066\u671D\u307E\u3067\u69CB\u60F3\u3092\u7DF4\u308B", score: [2,2,1,3,3] },
+          { text: "\u6DF1\u591C\u306B\u30A2\u30A4\u30C7\u30A2\u304C\u6D6E\u304B\u3076\u3053\u3068\u306F\u306A\u3044", score: [0,1,1,0,0] },
+        ],
+      },
+      {
+        id: 3, text: "\u53CB\u9054\u306B\u300C\u6700\u8FD1\u3069\u3046\uFF1F\u300D\u3068\u805E\u304B\u308C\u305F\u3002\u3042\u306A\u305F\u306E\u982D\u306E\u4E2D\u306F\uFF1F",
+        options: [
+          { text: "\u56DE\u7B54\u30923\u30D1\u30BF\u30FC\u30F3\u304F\u3089\u3044\u30B7\u30DF\u30E5\u30EC\u30FC\u30B7\u30E7\u30F3\u3057\u3066\u304B\u3089\u8A71\u3059", score: [1,3,2,0,1] },
+          { text: "\u6C17\u3065\u3044\u305F\u3089\u81EA\u5206\u306E\u8A71\u3092\u76DB\u3063\u3066\u8A71\u3057\u3066\u3044\u308B", score: [2,0,1,2,3] },
+          { text: "\u76F8\u624B\u306E\u8868\u60C5\u3092\u89B3\u5BDF\u3057\u306A\u304C\u3089\u7B54\u3048\u3092\u9078\u3093\u3067\u3044\u308B", score: [1,2,3,1,1] },
+          { text: "\u300C\u666E\u901A\u3060\u3088\u300D\u3067\u7D42\u308F\u308B", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 4, text: "\u597D\u304D\u306A\u672C\u306E\u8AAD\u307F\u65B9\u306F\uFF1F",
+        options: [
+          { text: "\u4E00\u6C17\u8AAD\u307F\u3002\u9014\u4E2D\u3067\u6B62\u3081\u3089\u308C\u306A\u3044", score: [3,0,1,3,2] },
+          { text: "\u69CB\u6210\u3084\u4F0F\u7DDA\u3092\u5206\u6790\u3057\u306A\u304C\u3089\u3058\u3063\u304F\u308A\u8AAD\u3080", score: [1,3,1,0,0] },
+          { text: "\u767B\u5834\u4EBA\u7269\u306B\u611F\u60C5\u79FB\u5165\u3057\u3059\u304E\u3066\u75B2\u308C\u308B", score: [2,1,2,3,2] },
+          { text: "\u3042\u307E\u308A\u672C\u306F\u8AAD\u307E\u306A\u3044", score: [0,0,0,0,1] },
+        ],
+      },
+      {
+        id: 5, text: "\u30B7\u30E3\u30EF\u30FC\u3092\u6D74\u3073\u3066\u3044\u308B\u3068\u304D\u3001\u4F55\u3092\u8003\u3048\u3066\u3044\u308B\uFF1F",
+        options: [
+          { text: "\u5B58\u5728\u3057\u306A\u3044\u8AB0\u304B\u3068\u306E\u67B6\u7A7A\u306E\u4F1A\u8A71", score: [2,0,1,2,3] },
+          { text: "\u4ECA\u65E5\u3042\u3063\u305F\u51FA\u6765\u4E8B\u306E\u300C\u3082\u3057\u3082\u300D\u30D0\u30FC\u30B8\u30E7\u30F3", score: [2,1,2,1,3] },
+          { text: "\u660E\u65E5\u306E\u30BF\u30B9\u30AF\u6574\u7406", score: [0,2,0,0,0] },
+          { text: "\u7121", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 6, text: "\u8AB0\u304B\u306E\u5618\u306B\u6C17\u3065\u3044\u305F\u3068\u304D\u3001\u6700\u521D\u306B\u601D\u3046\u3053\u3068\u306F\uFF1F",
+        options: [
+          { text: "\u300C\u306A\u305C\u3053\u306E\u4EBA\u306F\u5618\u3092\u3064\u304F\u5FC5\u8981\u304C\u3042\u3063\u305F\u3093\u3060\u308D\u3046\u300D\u3068\u52D5\u6A5F\u3092\u8003\u3048\u308B", score: [2,2,3,1,1] },
+          { text: "\u300C\u3053\u306E\u5618\u306E\u5B8C\u6210\u5EA6\u306F\u4F55\u70B9\u3060\u308D\u3046\u300D\u3068\u8A55\u4FA1\u3059\u308B", score: [1,3,2,0,2] },
+          { text: "\u611F\u60C5\u7684\u306B\u306A\u3063\u3066\u554F\u3044\u8A70\u3081\u305F\u304F\u306A\u308B", score: [1,0,1,3,0] },
+          { text: "\u30B9\u30EB\u30FC\u3059\u308B", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 7, text: "\u300C\u3042\u306A\u305F\u306E\u4EBA\u751F\u3092\u4E00\u8A00\u3067\u8868\u3059\u3068\uFF1F\u300D\u3068\u805E\u304B\u308C\u305F\u3089\uFF1F",
+        options: [
+          { text: "\u3059\u3050\u306B\u6C17\u306E\u5229\u3044\u305F\u30D5\u30EC\u30FC\u30BA\u304C\u6D6E\u304B\u3076", score: [3,1,1,1,2] },
+          { text: "\u4E00\u8A00\u3067\u306F\u8868\u305B\u306A\u3044\u3068\u601D\u3046\u3002\u4EBA\u751F\u306F\u8907\u96D1\u3060", score: [2,2,2,2,1] },
+          { text: "\u9762\u767D\u3044\u56DE\u7B54\u3092\u8003\u3048\u3088\u3046\u3068\u3057\u3066\u6C88\u9ED9\u3059\u308B", score: [1,1,0,1,2] },
+          { text: "\u300C\u666E\u901A\u300D", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 8, text: "\u5B50\u4F9B\u306E\u9803\u3001\u3088\u304F\u3084\u3063\u3066\u3044\u305F\u3053\u3068\u306F\uFF1F",
+        options: [
+          { text: "\u7A7A\u60F3\u306E\u4E16\u754C\u3067\u5192\u967A\u3057\u3066\u3044\u305F", score: [3,0,0,2,3] },
+          { text: "\u65E5\u8A18\u3084\u4F5C\u6587\u3092\u66F8\u304F\u306E\u304C\u597D\u304D\u3060\u3063\u305F", score: [2,2,1,2,1] },
+          { text: "\u4EBA\u306E\u884C\u52D5\u3092\u3088\u304F\u89B3\u5BDF\u3057\u3066\u3044\u305F", score: [1,2,3,0,1] },
+          { text: "\u5916\u3067\u904A\u3076\u306E\u304C\u597D\u304D\u3060\u3063\u305F", score: [0,0,0,1,0] },
+        ],
+      },
+      {
+        id: 9, text: "\u6620\u753B\u3084\u30C9\u30E9\u30DE\u3092\u89B3\u3066\u3044\u3066\u3001\u3064\u3044\u8003\u3048\u3066\u3057\u307E\u3046\u3053\u3068\u306F\uFF1F",
+        options: [
+          { text: "\u300C\u81EA\u5206\u306A\u3089\u3053\u306E\u811A\u672C\u3092\u3053\u3046\u66F8\u304D\u63DB\u3048\u308B\u300D", score: [3,2,1,1,2] },
+          { text: "\u300C\u3053\u306E\u30AD\u30E3\u30E9\u306E\u904E\u53BB\u306B\u306F\u4F55\u304C\u3042\u3063\u305F\u3093\u3060\u308D\u3046\u300D", score: [2,1,3,1,2] },
+          { text: "\u611F\u60C5\u79FB\u5165\u3057\u3059\u304E\u3066\u6CE3\u304F or \u6012\u308B", score: [1,0,1,3,1] },
+          { text: "\u7D14\u7C8B\u306B\u697D\u3057\u3093\u3067\u3044\u308B", score: [0,0,0,1,0] },
+        ],
+      },
+      {
+        id: 10, text: "SNS\u306B\u6295\u7A3F\u3059\u308B\u3068\u304D\u3001\u6700\u3082\u6642\u9593\u3092\u304B\u3051\u308B\u306E\u306F\uFF1F",
+        options: [
+          { text: "\u6587\u7AE0\u306E\u8A00\u3044\u56DE\u3057\u3092\u4F55\u5EA6\u3082\u63A8\u6572\u3059\u308B", score: [2,3,1,1,1] },
+          { text: "\u9762\u767D\u3044\u30A8\u30D4\u30BD\u30FC\u30C9\u3092\u76DB\u3063\u3066\u66F8\u304F", score: [2,0,1,2,3] },
+          { text: "\u6295\u7A3F\u3057\u305F\u5F8C\u306B\u300C\u3042\u306E\u8868\u73FE\u306E\u307B\u3046\u304C\u3088\u304B\u3063\u305F\u300D\u3068\u5F8C\u6094\u3059\u308B", score: [2,2,1,2,1] },
+          { text: "\u3042\u307E\u308ASNS\u306F\u4F7F\u308F\u306A\u3044 or \u9069\u5F53\u306B\u6295\u7A3F\u3059\u308B", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 11, text: "\u521D\u5BFE\u9762\u306E\u4EBA\u3068\u4F1A\u3063\u305F\u3068\u304D\u3001\u7121\u610F\u8B58\u306B\u3057\u3066\u3044\u308B\u3053\u3068\u306F\uFF1F",
+        options: [
+          { text: "\u3053\u306E\u4EBA\u3092\u5C0F\u8AAC\u306E\u30AD\u30E3\u30E9\u306B\u3057\u305F\u3089\u3069\u3093\u306A\u8A2D\u5B9A\u3060\u308D\u3046\u3068\u8003\u3048\u308B", score: [3,1,2,0,3] },
+          { text: "\u8A71\u3057\u65B9\u3084\u4ED5\u8349\u306E\u7656\u3092\u89B3\u5BDF\u3057\u3066\u3044\u308B", score: [1,2,3,0,1] },
+          { text: "\u76F8\u624B\u306E\u611F\u60C5\u3092\u654F\u611F\u306B\u5BDF\u77E5\u3057\u3066\u3044\u308B", score: [1,1,2,3,0] },
+          { text: "\u666E\u901A\u306B\u4F1A\u8A71\u3057\u3066\u3044\u308B", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 12, text: "\u6700\u5F8C\u306E\u8CEA\u554F\u3002\u3042\u306A\u305F\u304C\u6700\u3082\u5171\u611F\u3059\u308B\u8A00\u8449\u306F\uFF1F",
+        options: [
+          { text: "\u300C\u66F8\u304B\u305A\u306B\u306F\u3044\u3089\u308C\u306A\u3044\u300D", score: [3,1,1,3,2] },
+          { text: "\u300C\u7269\u8A9E\u306F\u4EBA\u9593\u3092\u7406\u89E3\u3059\u308B\u305F\u3081\u306E\u9053\u5177\u3060\u300D", score: [2,3,3,1,1] },
+          { text: "\u300C\u73FE\u5B9F\u3088\u308A\u9762\u767D\u3044\u4E16\u754C\u304C\u982D\u306E\u4E2D\u306B\u3042\u308B\u300D", score: [2,0,0,2,3] },
+          { text: "\u300C\u5225\u306B\u3069\u308C\u3082\u30D4\u30F3\u3068\u3053\u306A\u3044\u300D", score: [0,0,0,0,0] },
+        ],
+      },
+    ];
+
+    const RESULTS = [
+      {
+        type: "\u5929\u624D\u808C\u306E\u76F4\u611F\u578B\u5C0F\u8AAC\u5BB6", emoji: "\u26A1", suited: true, percentage: 92,
+        description: "\u3042\u306A\u305F\u306E\u8133\u306F\u7269\u8A9E\u751F\u6210\u30DE\u30B7\u30F3\u3067\u3059\u3002\u65E5\u5E38\u306E\u4E9B\u7D30\u306A\u51FA\u6765\u4E8B\u304B\u3089\u58EE\u5927\u306A\u30B9\u30C8\u30FC\u30EA\u30FC\u3092\u7D21\u304E\u51FA\u3059\u5929\u6027\u306E\u624D\u80FD\u304C\u3042\u308A\u307E\u3059\u3002\u8AD6\u7406\u3088\u308A\u76F4\u611F\u3001\u8A08\u753B\u3088\u308A\u885D\u52D5\u3002\u3042\u306A\u305F\u304C\u66F8\u304F\u7269\u8A9E\u306F\u3001\u8AAD\u8005\u306E\u4E88\u60F3\u3092\u88CF\u5207\u308B\u5C55\u958B\u3067\u5FC3\u3092\u638C\u3080\u3067\u3057\u3087\u3046\u3002",
+        advice: "\u8003\u3048\u308B\u524D\u306B\u66F8\u304D\u59CB\u3081\u3066\u304F\u3060\u3055\u3044\u3002\u3042\u306A\u305F\u306E\u76F4\u611F\u304C\u6700\u9AD8\u306E\u30D7\u30ED\u30C3\u30C8\u3092\u751F\u307F\u51FA\u3057\u307E\u3059\u3002",
+        writers: "\u592A\u5BB0\u6CBB\u3001\u30AB\u30FC\u30C8\u30FB\u30F4\u30A9\u30CD\u30AC\u30C3\u30C8\u3001\u6751\u7530\u6C99\u8036\u9999", color: "#FF6B35",
+      },
+      {
+        type: "\u7DFB\u5BC6\u306A\u69CB\u6210\u578B\u5C0F\u8AAC\u5BB6", emoji: "\uD83E\uDDE9", suited: true, percentage: 87,
+        description: "\u3042\u306A\u305F\u306F\u7269\u8A9E\u306E\u8A2D\u8A08\u56F3\u3092\u63CF\u3051\u308B\u7A00\u6709\u306A\u4EBA\u9593\u3067\u3059\u3002\u4F0F\u7DDA\u306E\u914D\u7F6E\u3001\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u30A2\u30FC\u30AF\u3001\u30D7\u30ED\u30C3\u30C8\u69CB\u9020\u2014\u2014\u3059\u3079\u3066\u3092\u8A08\u7B97\u3057\u5C3D\u304F\u3057\u305F\u7CBE\u5BC6\u306A\u7269\u8A9E\u3092\u69CB\u7BC9\u3067\u304D\u307E\u3059\u3002\u30DF\u30B9\u30C6\u30EA\u30FC\u3084\u58EE\u5927\u306ASF\u304C\u7279\u306B\u5411\u3044\u3066\u3044\u307E\u3059\u3002",
+        advice: "\u307E\u305A\u30D7\u30ED\u30C3\u30C8\u3092\u69CB\u9020\u5316\u3057\u3001\u5404\u7AE0\u306E\u5F79\u5272\u3092\u660E\u78BA\u306B\u3057\u3066\u304B\u3089\u66F8\u304D\u59CB\u3081\u308B\u3068\u771F\u4FA1\u3092\u767A\u63EE\u3057\u307E\u3059\u3002",
+        writers: "\u5BAE\u90E8\u307F\u3086\u304D\u3001\u4F0A\u5742\u5E78\u592A\u90CE\u3001\u30A2\u30AC\u30B5\u30FB\u30AF\u30EA\u30B9\u30C6\u30A3", color: "#4ECDC4",
+      },
+      {
+        type: "\u4EBA\u9593\u89B3\u5BDF\u306E\u9054\u4EBA\u578B\u5C0F\u8AAC\u5BB6", emoji: "\uD83D\uDC41\uFE0F", suited: true, percentage: 89,
+        description: "\u3042\u306A\u305F\u306F\u4EBA\u9593\u3068\u3044\u3046\u751F\u304D\u7269\u3092\u6DF1\u304F\u7406\u89E3\u3057\u3066\u3044\u307E\u3059\u3002\u8868\u60C5\u306E\u5FAE\u5999\u306A\u5909\u5316\u3001\u58F0\u306E\u30C8\u30FC\u30F3\u3001\u8A00\u8449\u306E\u88CF\u306B\u96A0\u3055\u308C\u305F\u672C\u97F3\u2014\u2014\u305D\u306E\u6D1E\u5BDF\u529B\u306F\u5C0F\u8AAC\u5BB6\u306B\u3068\u3063\u3066\u6700\u5F37\u306E\u6B66\u5668\u3067\u3059\u3002\u30EA\u30A2\u30EA\u30C6\u30A3\u306E\u3042\u308B\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3092\u63CF\u304B\u305B\u305F\u3089\u53F3\u306B\u51FA\u308B\u8005\u306F\u3044\u307E\u305B\u3093\u3002",
+        advice: "\u30AB\u30D5\u30A7\u306B\u5EA7\u3063\u3066\u9053\u884C\u304F\u4EBA\u3092\u89B3\u5BDF\u3059\u308B\u6642\u9593\u3092\u4F5C\u3063\u3066\u304F\u3060\u3055\u3044\u3002\u305D\u308C\u304C\u3042\u306A\u305F\u306E\u6700\u9AD8\u306E\u53D6\u6750\u3067\u3059\u3002",
+        writers: "\u5411\u7530\u90A6\u5B50\u3001\u4E09\u6D66\u3057\u3092\u3093\u3001\u30EC\u30A4\u30E2\u30F3\u30C9\u30FB\u30AB\u30FC\u30F4\u30A1\u30FC", color: "#9B59B6",
+      },
+      {
+        type: "\u611F\u60C5\u7206\u767A\u578B\u5C0F\u8AAC\u5BB6", emoji: "\uD83D\uDD25", suited: true, percentage: 85,
+        description: "\u3042\u306A\u305F\u306E\u611F\u53D7\u6027\u306F\u5E38\u4EBA\u306E3\u500D\u3067\u3059\u3002\u559C\u6012\u54C0\u697D\u304C\u6FC0\u3057\u304F\u3001\u305D\u306E\u6EA2\u308C\u51FA\u308B\u611F\u60C5\u3053\u305D\u304C\u8AAD\u8005\u306E\u5FC3\u3092\u63FA\u3055\u3076\u308B\u539F\u52D5\u529B\u306B\u306A\u308A\u307E\u3059\u3002\u3042\u306A\u305F\u306E\u66F8\u304F\u6587\u7AE0\u306B\u306F\u300C\u4F53\u6E29\u300D\u304C\u3042\u308A\u3001\u8AAD\u8005\u306F\u601D\u308F\u305A\u6D99\u3059\u308B\u3067\u3057\u3087\u3046\u3002",
+        advice: "\u611F\u60C5\u304C\u9AD8\u3076\u3063\u305F\u77AC\u9593\u306B\u3059\u3050\u66F8\u304D\u59CB\u3081\u3066\u304F\u3060\u3055\u3044\u3002\u305D\u306E\u751F\u3005\u3057\u3055\u304C\u6700\u5927\u306E\u6B66\u5668\u3067\u3059\u3002",
+        writers: "\u4E2D\u539F\u4E2D\u4E5F\u3001\u3088\u3057\u3082\u3068\u3070\u306A\u306A\u3001\u30C9\u30B9\u30C8\u30A8\u30D5\u30B9\u30AD\u30FC", color: "#E74C3C",
+      },
+      {
+        type: "\u5984\u60F3\u529B\u5168\u958B\u578B\u5C0F\u8AAC\u5BB6", emoji: "\uD83C\uDF00", suited: true, percentage: 94,
+        description: "\u3042\u306A\u305F\u306E\u982D\u306E\u4E2D\u306B\u306F\u7121\u9650\u306E\u5B87\u5B99\u304C\u5E83\u304C\u3063\u3066\u3044\u307E\u3059\u3002\u73FE\u5B9F\u3068\u7A7A\u60F3\u306E\u5883\u754C\u304C\u66D6\u6627\u3067\u3001\u5E38\u306B\u300C\u3082\u3046\u4E00\u3064\u306E\u4E16\u754C\u300D\u306B\u7247\u8DB3\u3092\u7A81\u3063\u8FBC\u3093\u3067\u3044\u308B\u72B6\u614B\u3002\u30D5\u30A1\u30F3\u30BF\u30B8\u30FC\u3001SF\u3001\u4E0D\u601D\u8B70\u306A\u6587\u5B66\u2014\u2014\u3042\u306A\u305F\u306B\u3057\u304B\u66F8\u3051\u306A\u3044\u4E16\u754C\u304C\u3042\u308A\u307E\u3059\u3002",
+        advice: "\u5984\u60F3\u3092\u30CE\u30FC\u30C8\u306B\u66F8\u304D\u6E9C\u3081\u3066\u304F\u3060\u3055\u3044\u3002\u3042\u306A\u305F\u306E\u8133\u5185\u4E16\u754C\u306F\u3001\u305D\u306E\u307E\u307E\u58F2\u308C\u308B\u5C0F\u8AAC\u306E\u30CD\u30BF\u3067\u3059\u3002",
+        writers: "\u661F\u65B0\u4E00\u3001\u6751\u4E0A\u6625\u6A39\u3001\u30AC\u30D6\u30EA\u30A8\u30EB\u30FB\u30AC\u30EB\u30B7\u30A2\uFF1D\u30DE\u30EB\u30B1\u30B9", color: "#3498DB",
+      },
+      {
+        type: "\u6F5C\u5728\u80FD\u529B\u899A\u9192\u5F85\u3061\u578B", emoji: "\uD83C\uDF31", suited: false, percentage: 45,
+        description: "\u73FE\u6642\u70B9\u3067\u306F\u5C0F\u8AAC\u5BB6\u306E\u8CC7\u8CEA\u306F\u307E\u3060\u7720\u3063\u3066\u3044\u308B\u6BB5\u968E\u3067\u3059\u3002\u3057\u304B\u3057\u5B89\u5FC3\u3057\u3066\u304F\u3060\u3055\u3044\u3002\u591A\u304F\u306E\u5049\u5927\u306A\u4F5C\u5BB6\u3082\u3001\u6700\u521D\u306F\u300C\u81EA\u5206\u306B\u624D\u80FD\u304C\u3042\u308B\u300D\u306A\u3093\u3066\u601D\u3063\u3066\u3044\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u3042\u306A\u305F\u306B\u5FC5\u8981\u306A\u306E\u306F\u3001\u66F8\u304D\u59CB\u3081\u308B\u304D\u3063\u304B\u3051\u3060\u3051\u3067\u3059\u3002",
+        advice: "\u307E\u305A\u306F1\u65E55\u5206\u3001\u601D\u3063\u305F\u3053\u3068\u3092\u66F8\u304F\u7FD2\u6163\u304B\u3089\u59CB\u3081\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002\u624D\u80FD\u306F\u66F8\u304F\u3053\u3068\u3067\u76EE\u899A\u3081\u307E\u3059\u3002",
+        writers: "\u3042\u306A\u305F\u306F\u307E\u3060\u898B\u306C\u65B0\u3057\u3044\u30BF\u30A4\u30D7\u306E\u4F5C\u5BB6\u304B\u3082\u3057\u308C\u307E\u305B\u3093", color: "#95A5A6",
+      },
+      {
+        type: "\u7DE8\u96C6\u8005\u30FB\u6279\u8A55\u5BB6\u30BF\u30A4\u30D7", emoji: "\uD83D\uDCDD", suited: false, percentage: 32,
+        description: "\u3042\u306A\u305F\u306E\u624D\u80FD\u306F\u300C\u66F8\u304F\u300D\u3053\u3068\u3088\u308A\u300C\u898B\u629C\u304F\u300D\u3053\u3068\u306B\u3042\u308A\u307E\u3059\u3002\u4F5C\u54C1\u306E\u826F\u3057\u60AA\u3057\u3092\u7684\u78BA\u306B\u5224\u65AD\u3057\u3001\u6539\u5584\u70B9\u3092\u898B\u3064\u3051\u51FA\u3059\u92ED\u3044\u76EE\u3092\u6301\u3063\u3066\u3044\u307E\u3059\u3002\u5C0F\u8AAC\u5BB6\u3088\u308A\u7DE8\u96C6\u8005\u3084\u30D6\u30C3\u30AF\u30EC\u30D3\u30E5\u30A2\u30FC\u3068\u3057\u3066\u8F1D\u304F\u304B\u3082\u3057\u308C\u307E\u305B\u3093\u3002",
+        advice: "\u3082\u3057\u66F8\u304F\u306A\u3089\u3001\u307E\u305A\u5927\u91CF\u306B\u8AAD\u3093\u3067\u304B\u3089\u3002\u3042\u306A\u305F\u306E\u5206\u6790\u529B\u306F\u3001\u66F8\u304F\u7D4C\u9A13\u3068\u639B\u3051\u5408\u308F\u305B\u308B\u3068\u6700\u5F37\u3067\u3059\u3002",
+        writers: "\u6279\u8A55\u5BB6\u3068\u3057\u3066\uFF1A\u5C0F\u6797\u79C0\u96C4\u3001\u67C4\u8C37\u884C\u4EBA", color: "#7F8C8D",
+      },
+    ];
+
+    function getResult(answers) {
+      const scores = [0, 0, 0, 0, 0];
+      answers.forEach(function(a) {
+        var q = QUESTIONS[a.questionIndex];
+        var option = q.options[a.optionIndex];
+        option.score.forEach(function(s, i) { scores[i] += s; });
+      });
+      var maxScore = Math.max.apply(null, scores);
+      var total = scores.reduce(function(a, b) { return a + b; }, 0);
+      if (total <= 8) return RESULTS[6];
+      if (total <= 14) return RESULTS[5];
+      var maxIndex = scores.indexOf(maxScore);
+      return RESULTS[maxIndex];
+    }
+
+    function StarField() {
+      var stars = [];
+      for (var i = 0; i < 40; i++) {
+        stars.push(
+          <div key={i} style={{
+            position: 'absolute',
+            width: i % 3 === 0 ? '3px' : '2px',
+            height: i % 3 === 0 ? '3px' : '2px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(255,255,255,' + (0.2 + Math.random() * 0.5) + ')',
+            left: (Math.random() * 100) + '%',
+            top: (Math.random() * 100) + '%',
+            animation: 'twinkle ' + (2 + Math.random() * 3) + 's ease-in-out infinite',
+            animationDelay: (Math.random() * 3) + 's',
+          }} />
+        );
+      }
+      return <div style={{ position: 'fixed', inset: 0, overflow: 'hidden', pointerEvents: 'none', zIndex: 0 }}>{stars}</div>;
+    }
+
+    function IntroScreen(props) {
+      return (
+        <div style={{
+          minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', padding: '2rem', textAlign: 'center',
+          animation: 'fadeInUp 0.8s ease-out', position: 'relative', zIndex: 1,
+        }}>
+          <div style={{ fontSize: '4rem', marginBottom: '0.5rem', animation: 'float 3s ease-in-out infinite' }}>
+            🔮
+          </div>
+          <div style={{ fontSize: '0.7rem', letterSpacing: '6px', textTransform: 'uppercase', color: '#888', marginBottom: '1rem', fontWeight: 500 }}>
+            Novelist Aptitude Diagnosis
+          </div>
+          <h1 style={{
+            fontFamily: "'Shippori Mincho', serif", fontSize: 'clamp(2rem, 6vw, 3.2rem)',
+            fontWeight: 800, lineHeight: 1.3, marginBottom: '1.5rem',
+            background: 'linear-gradient(135deg, #FF6B35, #FFD700, #FF6B35)',
+            backgroundSize: '200% auto', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+            animation: 'shimmer 4s linear infinite',
+          }}>
+            あなたは<br />小説家に向いているか<br />診断
+          </h1>
+          <p style={{ fontSize: '0.95rem', color: '#999', maxWidth: '360px', lineHeight: 1.8, marginBottom: '0.8rem' }}>
+            たった12の質問で、あなたの中に眠る<br />「物語を紡ぐ才能」を科学的(?)に診断します。
+          </p>
+          <p style={{ fontSize: '0.72rem', color: '#666', marginBottom: '2.5rem', fontStyle: 'italic' }}>
+            ※ 診断時間：約3〜5分 ／ 累計診断数 284,927人（嘘）
+          </p>
+          <button onClick={props.onStart} style={{
+            background: 'linear-gradient(135deg, #FF6B35, #FF8C42)', color: '#fff', border: 'none',
+            padding: '1rem 3rem', fontSize: '1.1rem', fontWeight: 700, borderRadius: '60px',
+            cursor: 'pointer', fontFamily: "'Zen Kaku Gothic New', sans-serif",
+            animation: 'pulseGlow 2s ease-in-out infinite', position: 'relative', zIndex: 2,
+          }}>
+            診断をはじめる →
+          </button>
+          <div style={{ marginTop: '3rem', display: 'flex', gap: '2rem', fontSize: '0.75rem', color: '#555' }}>
+            <span>📱 スマホ対応</span><span>⏱️ 約3分</span><span>🔒 データ保存なし</span>
+          </div>
+        </div>
+      );
+    }
+
+    function QuestionScreen(props) {
+      var question = props.question;
+      var questionIndex = props.questionIndex;
+      var total = props.total;
+      var onAnswer = props.onAnswer;
+      var ref = useState(null);
+      var selected = ref[0];
+      var setSelected = ref[1];
+      var ref2 = useState(false);
+      var animating = ref2[0];
+      var setAnimating = ref2[1];
+
+      var handleSelect = function(optionIndex) {
+        if (animating) return;
+        setSelected(optionIndex);
+        setAnimating(true);
+        setTimeout(function() {
+          onAnswer(optionIndex);
+          setSelected(null);
+          setAnimating(false);
+        }, 500);
+      };
+
+      var progress = ((questionIndex + 1) / total) * 100;
+
+      return (
+        <div key={question.id} style={{
+          minHeight: '100vh', display: 'flex', flexDirection: 'column', padding: '2rem 1.5rem',
+          maxWidth: '540px', margin: '0 auto', position: 'relative', zIndex: 1,
+          animation: 'slideIn 0.4s ease-out',
+        }}>
+          <div style={{ marginBottom: '2rem', marginTop: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.75rem', color: '#888' }}>
+              <span>Q{questionIndex + 1} / {total}</span>
+              <span>{Math.round(progress)}%</span>
+            </div>
+            <div style={{ height: '3px', background: '#222', borderRadius: '2px', overflow: 'hidden' }}>
+              <div style={{ height: '100%', width: progress + '%', background: 'linear-gradient(90deg, #FF6B35, #FFD700)', borderRadius: '2px', transition: 'width 0.5s ease' }} />
+            </div>
+          </div>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <h2 style={{
+              fontFamily: "'Shippori Mincho', serif", fontSize: 'clamp(1.2rem, 4vw, 1.5rem)',
+              fontWeight: 600, lineHeight: 1.7, marginBottom: '2.5rem', color: '#f0f0f5',
+            }}>
+              {question.text}
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {question.options.map(function(option, idx) {
+                return (
+                  <button key={idx} onClick={function() { handleSelect(idx); }} style={{
+                    background: selected === idx
+                      ? 'linear-gradient(135deg, rgba(255,107,53,0.3), rgba(255,107,53,0.15))'
+                      : 'rgba(255,255,255,0.04)',
+                    border: selected === idx
+                      ? '1px solid rgba(255,107,53,0.6)'
+                      : '1px solid rgba(255,255,255,0.08)',
+                    padding: '1rem 1.2rem', borderRadius: '14px',
+                    color: selected === idx ? '#FFD700' : '#ccc',
+                    fontSize: '0.95rem', lineHeight: 1.6, cursor: 'pointer',
+                    fontFamily: "'Zen Kaku Gothic New', sans-serif", textAlign: 'left',
+                    transition: 'all 0.3s ease',
+                    transform: selected === idx ? 'scale(1.02)' : 'scale(1)',
+                    animation: 'slideIn 0.4s ease-out',
+                    animationDelay: (idx * 0.08) + 's', animationFillMode: 'backwards',
+                  }}>
+                    <span style={{ marginRight: '0.6rem', opacity: 0.4, fontSize: '0.8rem' }}>
+                      {String.fromCharCode(65 + idx)}.
+                    </span>
+                    {option.text}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function ResultScreen(props) {
+      var result = props.result;
+      var onRetry = props.onRetry;
+      var ref = useState(false);
+      var shared = ref[0];
+      var setShared = ref[1];
+
+      var shareText = '🔮 小説家適性診断の結果\n\n' + result.emoji + ' ' + result.type + '\n（適性度 ' + result.percentage + '%）\n\n' + (result.suited ? '小説家の才能があるらしい…！' : 'まだ才能は眠っているらしい…') + '\n\n▶ あなたも診断してみる';
+
+      var handleShare = function() {
+        var url = encodeURIComponent(window.location.href);
+        var text = encodeURIComponent(shareText);
+        window.open('https://twitter.com/intent/tweet?text=' + text + '&url=' + url, '_blank');
+      };
+
+      var handleCopy = function() {
+        navigator.clipboard.writeText(shareText).then(function() {
+          setShared(true);
+          setTimeout(function() { setShared(false); }, 2000);
+        });
+      };
+
+      return (
+        <div style={{
+          minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center',
+          padding: '2rem 1.5rem', maxWidth: '540px', margin: '0 auto', position: 'relative', zIndex: 1,
+        }}>
+          <div style={{ marginTop: '2rem', marginBottom: '1rem', fontSize: '0.7rem', letterSpacing: '4px', color: '#888', animation: 'fadeInUp 0.6s ease-out' }}>
+            ─── DIAGNOSIS RESULT ───
+          </div>
+          <div style={{
+            background: 'linear-gradient(160deg, ' + result.color + '15, ' + result.color + '08, rgba(10,10,26,0.9))',
+            border: '1px solid ' + result.color + '40', borderRadius: '24px',
+            padding: '2rem 1.8rem', width: '100%', animation: 'resultReveal 0.8s ease-out', marginBottom: '1.5rem',
+          }}>
+            <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+              <div style={{ fontSize: '3.5rem', marginBottom: '0.8rem' }}>{result.emoji}</div>
+              <div style={{ fontSize: '0.7rem', color: result.suited ? '#FFD700' : '#999', letterSpacing: '2px', marginBottom: '0.5rem' }}>
+                {result.suited ? '✨ 小説家適性あり ✨' : '📚 別の才能あり'}
+              </div>
+              <h2 style={{
+                fontFamily: "'Shippori Mincho', serif", fontSize: 'clamp(1.4rem, 5vw, 1.8rem)',
+                fontWeight: 800, color: result.color, lineHeight: 1.4,
+              }}>
+                {result.type}
+              </h2>
+            </div>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: '#999', marginBottom: '0.4rem' }}>
+                <span>小説家適性度</span>
+                <span style={{ color: result.color, fontWeight: 700, fontSize: '1rem' }}>{result.percentage}%</span>
+              </div>
+              <div style={{ height: '6px', background: 'rgba(255,255,255,0.06)', borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ height: '100%', width: result.percentage + '%', background: 'linear-gradient(90deg, ' + result.color + ', ' + result.color + '88)', borderRadius: '3px', transition: 'width 1.5s ease-out' }} />
+              </div>
+            </div>
+            <p style={{ fontSize: '0.92rem', lineHeight: 1.9, color: '#ccc', marginBottom: '1.5rem' }}>
+              {result.description}
+            </p>
+            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1rem 1.2rem', marginBottom: '1rem' }}>
+              <div style={{ fontSize: '0.7rem', color: result.color, letterSpacing: '2px', marginBottom: '0.5rem', fontWeight: 700 }}>
+                💡 アドバイス
+              </div>
+              <p style={{ fontSize: '0.88rem', lineHeight: 1.7, color: '#bbb' }}>{result.advice}</p>
+            </div>
+            <div style={{ fontSize: '0.78rem', color: '#777', lineHeight: 1.7 }}>
+              <span style={{ color: '#999' }}>同じタイプの作家：</span>{result.writers}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '0.8rem', width: '100%', marginBottom: '1rem', animation: 'fadeInUp 0.8s ease-out 0.3s backwards' }}>
+            <button onClick={handleShare} style={{
+              flex: 1, background: '#1DA1F2', color: '#fff', border: 'none', padding: '0.9rem',
+              borderRadius: '14px', fontSize: '0.9rem', fontWeight: 700, cursor: 'pointer',
+              fontFamily: "'Zen Kaku Gothic New', sans-serif",
+            }}>
+              𝕏 でシェアする
+            </button>
+            <button onClick={handleCopy} style={{
+              padding: '0.9rem 1.2rem', background: 'rgba(255,255,255,0.08)', color: '#ccc',
+              border: '1px solid rgba(255,255,255,0.12)', borderRadius: '14px', fontSize: '0.85rem',
+              cursor: 'pointer', fontFamily: "'Zen Kaku Gothic New', sans-serif",
+            }}>
+              {shared ? '✓ コピー済' : '📋 コピー'}
+            </button>
+          </div>
+          <button onClick={onRetry} style={{
+            background: 'none', border: '1px solid rgba(255,255,255,0.1)', color: '#888',
+            padding: '0.8rem 2rem', borderRadius: '60px', fontSize: '0.85rem', cursor: 'pointer',
+            fontFamily: "'Zen Kaku Gothic New', sans-serif", marginBottom: '2rem',
+          }}>
+            もう一度診断する
+          </button>
+          <p style={{ fontSize: '0.65rem', color: '#444', textAlign: 'center', lineHeight: 1.6, maxWidth: '300px' }}>
+            ※ この診断はエンターテインメントです。<br />科学的根拠はありませんが、あなたの才能は本物です。
+          </p>
+        </div>
+      );
+    }
+
+    function App() {
+      var ref1 = useState('intro');
+      var screen = ref1[0]; var setScreen = ref1[1];
+      var ref2 = useState(0);
+      var currentQuestion = ref2[0]; var setCurrentQuestion = ref2[1];
+      var ref3 = useState([]);
+      var answers = ref3[0]; var setAnswers = ref3[1];
+      var ref4 = useState(null);
+      var result = ref4[0]; var setResult = ref4[1];
+
+      var handleStart = function() { setScreen('question'); setCurrentQuestion(0); setAnswers([]); };
+
+      var handleAnswer = function(optionIndex) {
+        var newAnswers = answers.concat([{ questionIndex: currentQuestion, optionIndex: optionIndex }]);
+        setAnswers(newAnswers);
+        if (currentQuestion + 1 >= QUESTIONS.length) {
+          setResult(getResult(newAnswers));
+          setScreen('result');
+        } else {
+          setCurrentQuestion(currentQuestion + 1);
+        }
+      };
+
+      var handleRetry = function() { setScreen('intro'); setCurrentQuestion(0); setAnswers([]); setResult(null); };
+
+      return (
+        <div>
+          <StarField />
+          <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
+            {screen === 'intro' && <IntroScreen onStart={handleStart} />}
+            {screen === 'question' && <QuestionScreen question={QUESTIONS[currentQuestion]} questionIndex={currentQuestion} total={QUESTIONS.length} onAnswer={handleAnswer} />}
+            {screen === 'result' && <ResultScreen result={result} onRetry={handleRetry} />}
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
