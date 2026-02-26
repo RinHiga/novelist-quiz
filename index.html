@@ -85,168 +85,353 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState } = React;
+    const { useState, useMemo } = React;
 
-    const QUESTIONS = [
+    // ========== 全30問の質問プール ==========
+    // score: [直感型, 構成型, 観察型, 感情型, 妄想型]
+    const ALL_QUESTIONS = [
       {
-        id: 1, text: "\u96FB\u8ECA\u306E\u4E2D\u3067\u96A3\u306E\u4EBA\u306E\u4F1A\u8A71\u304C\u805E\u3053\u3048\u3066\u304D\u305F\u3002\u3042\u306A\u305F\u306F\uFF1F",
+        id: 1, text: "電車の中で隣の人の会話が聞こえてきた。あなたは？",
         options: [
-          { text: "\u52DD\u624B\u306B\u305D\u306E\u4EBA\u305F\u3061\u306E\u4EBA\u751F\u306E\u80CC\u666F\u3092\u60F3\u50CF\u3057\u59CB\u3081\u308B", score: [3,0,3,1,3] },
-          { text: "\u9762\u767D\u3044\u30D5\u30EC\u30FC\u30BA\u304C\u3042\u308C\u3070\u3053\u3063\u305D\u308A\u30E1\u30E2\u3059\u308B", score: [2,2,2,0,1] },
-          { text: "\u30A4\u30E4\u30DB\u30F3\u3092\u3057\u3066\u81EA\u5206\u306E\u4E16\u754C\u306B\u5165\u308B", score: [1,1,0,2,2] },
-          { text: "\u7279\u306B\u6C17\u306B\u3057\u306A\u3044", score: [0,1,0,0,0] },
+          { text: "勝手にその人たちの人生の背景を想像し始める", score: [3,0,3,1,3] },
+          { text: "面白いフレーズがあればこっそりメモする", score: [2,2,2,0,1] },
+          { text: "イヤホンをして自分の世界に入る", score: [1,1,0,2,2] },
+          { text: "特に気にしない", score: [0,1,0,0,0] },
         ],
       },
       {
-        id: 2, text: "\u6DF1\u591C3\u6642\u3001\u7A81\u7136\u3059\u3054\u3044\u30A2\u30A4\u30C7\u30A2\u304C\u6D6E\u304B\u3093\u3060\u3002\u3069\u3046\u3059\u308B\uFF1F",
+        id: 2, text: "深夜3時、突然すごいアイデアが浮かんだ。どうする？",
         options: [
-          { text: "\u98DB\u3073\u8D77\u304D\u3066\u30B9\u30DE\u30DB\u306B\u30E1\u30E2\u3059\u308B", score: [3,1,1,2,2] },
-          { text: "\u671D\u8D77\u304D\u305F\u3089\u899A\u3048\u3066\u308B\u3060\u308D\u3046\u3068\u601D\u3063\u3066\u5BDD\u308B\uFF08\u899A\u3048\u3066\u306A\u3044\uFF09", score: [1,0,0,1,2] },
-          { text: "\u305D\u306E\u307E\u307E\u8208\u596E\u3057\u3066\u671D\u307E\u3067\u69CB\u60F3\u3092\u7DF4\u308B", score: [2,2,1,3,3] },
-          { text: "\u6DF1\u591C\u306B\u30A2\u30A4\u30C7\u30A2\u304C\u6D6E\u304B\u3076\u3053\u3068\u306F\u306A\u3044", score: [0,1,1,0,0] },
+          { text: "飛び起きてスマホにメモする", score: [3,1,1,2,2] },
+          { text: "朝起きたら覚えてるだろうと思って寝る（覚えてない）", score: [1,0,0,1,2] },
+          { text: "そのまま興奮して朝まで構想を練る", score: [2,2,1,3,3] },
+          { text: "深夜にアイデアが浮かぶことはない", score: [0,1,1,0,0] },
         ],
       },
       {
-        id: 3, text: "\u53CB\u9054\u306B\u300C\u6700\u8FD1\u3069\u3046\uFF1F\u300D\u3068\u805E\u304B\u308C\u305F\u3002\u3042\u306A\u305F\u306E\u982D\u306E\u4E2D\u306F\uFF1F",
+        id: 3, text: "友達に「最近どう？」と聞かれた。あなたの頭の中は？",
         options: [
-          { text: "\u56DE\u7B54\u30923\u30D1\u30BF\u30FC\u30F3\u304F\u3089\u3044\u30B7\u30DF\u30E5\u30EC\u30FC\u30B7\u30E7\u30F3\u3057\u3066\u304B\u3089\u8A71\u3059", score: [1,3,2,0,1] },
-          { text: "\u6C17\u3065\u3044\u305F\u3089\u81EA\u5206\u306E\u8A71\u3092\u76DB\u3063\u3066\u8A71\u3057\u3066\u3044\u308B", score: [2,0,1,2,3] },
-          { text: "\u76F8\u624B\u306E\u8868\u60C5\u3092\u89B3\u5BDF\u3057\u306A\u304C\u3089\u7B54\u3048\u3092\u9078\u3093\u3067\u3044\u308B", score: [1,2,3,1,1] },
-          { text: "\u300C\u666E\u901A\u3060\u3088\u300D\u3067\u7D42\u308F\u308B", score: [0,0,0,0,0] },
+          { text: "回答を3パターンくらいシミュレーションしてから話す", score: [1,3,2,0,1] },
+          { text: "気づいたら自分の話を盛って話している", score: [2,0,1,2,3] },
+          { text: "相手の表情を観察しながら答えを選んでいる", score: [1,2,3,1,1] },
+          { text: "「普通だよ」で終わる", score: [0,0,0,0,0] },
         ],
       },
       {
-        id: 4, text: "\u597D\u304D\u306A\u672C\u306E\u8AAD\u307F\u65B9\u306F\uFF1F",
+        id: 4, text: "好きな本の読み方は？",
         options: [
-          { text: "\u4E00\u6C17\u8AAD\u307F\u3002\u9014\u4E2D\u3067\u6B62\u3081\u3089\u308C\u306A\u3044", score: [3,0,1,3,2] },
-          { text: "\u69CB\u6210\u3084\u4F0F\u7DDA\u3092\u5206\u6790\u3057\u306A\u304C\u3089\u3058\u3063\u304F\u308A\u8AAD\u3080", score: [1,3,1,0,0] },
-          { text: "\u767B\u5834\u4EBA\u7269\u306B\u611F\u60C5\u79FB\u5165\u3057\u3059\u304E\u3066\u75B2\u308C\u308B", score: [2,1,2,3,2] },
-          { text: "\u3042\u307E\u308A\u672C\u306F\u8AAD\u307E\u306A\u3044", score: [0,0,0,0,1] },
+          { text: "一気読み。途中で止められない", score: [3,0,1,3,2] },
+          { text: "構成や伏線を分析しながらじっくり読む", score: [1,3,1,0,0] },
+          { text: "登場人物に感情移入しすぎて疲れる", score: [2,1,2,3,2] },
+          { text: "あまり本は読まない", score: [0,0,0,0,1] },
         ],
       },
       {
-        id: 5, text: "\u30B7\u30E3\u30EF\u30FC\u3092\u6D74\u3073\u3066\u3044\u308B\u3068\u304D\u3001\u4F55\u3092\u8003\u3048\u3066\u3044\u308B\uFF1F",
+        id: 5, text: "シャワーを浴びているとき、何を考えている？",
         options: [
-          { text: "\u5B58\u5728\u3057\u306A\u3044\u8AB0\u304B\u3068\u306E\u67B6\u7A7A\u306E\u4F1A\u8A71", score: [2,0,1,2,3] },
-          { text: "\u4ECA\u65E5\u3042\u3063\u305F\u51FA\u6765\u4E8B\u306E\u300C\u3082\u3057\u3082\u300D\u30D0\u30FC\u30B8\u30E7\u30F3", score: [2,1,2,1,3] },
-          { text: "\u660E\u65E5\u306E\u30BF\u30B9\u30AF\u6574\u7406", score: [0,2,0,0,0] },
-          { text: "\u7121", score: [0,0,0,0,0] },
+          { text: "存在しない誰かとの架空の会話", score: [2,0,1,2,3] },
+          { text: "今日あった出来事の「もしも」バージョン", score: [2,1,2,1,3] },
+          { text: "明日のタスク整理", score: [0,2,0,0,0] },
+          { text: "無", score: [0,0,0,0,0] },
         ],
       },
       {
-        id: 6, text: "\u8AB0\u304B\u306E\u5618\u306B\u6C17\u3065\u3044\u305F\u3068\u304D\u3001\u6700\u521D\u306B\u601D\u3046\u3053\u3068\u306F\uFF1F",
+        id: 6, text: "誰かの嘘に気づいたとき、最初に思うことは？",
         options: [
-          { text: "\u300C\u306A\u305C\u3053\u306E\u4EBA\u306F\u5618\u3092\u3064\u304F\u5FC5\u8981\u304C\u3042\u3063\u305F\u3093\u3060\u308D\u3046\u300D\u3068\u52D5\u6A5F\u3092\u8003\u3048\u308B", score: [2,2,3,1,1] },
-          { text: "\u300C\u3053\u306E\u5618\u306E\u5B8C\u6210\u5EA6\u306F\u4F55\u70B9\u3060\u308D\u3046\u300D\u3068\u8A55\u4FA1\u3059\u308B", score: [1,3,2,0,2] },
-          { text: "\u611F\u60C5\u7684\u306B\u306A\u3063\u3066\u554F\u3044\u8A70\u3081\u305F\u304F\u306A\u308B", score: [1,0,1,3,0] },
-          { text: "\u30B9\u30EB\u30FC\u3059\u308B", score: [0,0,0,0,0] },
+          { text: "「なぜこの人は嘘をつく必要があったんだろう」と動機を考える", score: [2,2,3,1,1] },
+          { text: "「この嘘の完成度は何点だろう」と評価する", score: [1,3,2,0,2] },
+          { text: "感情的になって問い詰めたくなる", score: [1,0,1,3,0] },
+          { text: "スルーする", score: [0,0,0,0,0] },
         ],
       },
       {
-        id: 7, text: "\u300C\u3042\u306A\u305F\u306E\u4EBA\u751F\u3092\u4E00\u8A00\u3067\u8868\u3059\u3068\uFF1F\u300D\u3068\u805E\u304B\u308C\u305F\u3089\uFF1F",
+        id: 7, text: "「あなたの人生を一言で表すと？」と聞かれたら？",
         options: [
-          { text: "\u3059\u3050\u306B\u6C17\u306E\u5229\u3044\u305F\u30D5\u30EC\u30FC\u30BA\u304C\u6D6E\u304B\u3076", score: [3,1,1,1,2] },
-          { text: "\u4E00\u8A00\u3067\u306F\u8868\u305B\u306A\u3044\u3068\u601D\u3046\u3002\u4EBA\u751F\u306F\u8907\u96D1\u3060", score: [2,2,2,2,1] },
-          { text: "\u9762\u767D\u3044\u56DE\u7B54\u3092\u8003\u3048\u3088\u3046\u3068\u3057\u3066\u6C88\u9ED9\u3059\u308B", score: [1,1,0,1,2] },
-          { text: "\u300C\u666E\u901A\u300D", score: [0,0,0,0,0] },
+          { text: "すぐに気の利いたフレーズが浮かぶ", score: [3,1,1,1,2] },
+          { text: "一言では表せないと思う。人生は複雑だ", score: [2,2,2,2,1] },
+          { text: "面白い回答を考えようとして沈黙する", score: [1,1,0,1,2] },
+          { text: "「普通」", score: [0,0,0,0,0] },
         ],
       },
       {
-        id: 8, text: "\u5B50\u4F9B\u306E\u9803\u3001\u3088\u304F\u3084\u3063\u3066\u3044\u305F\u3053\u3068\u306F\uFF1F",
+        id: 8, text: "子供の頃、よくやっていたことは？",
         options: [
-          { text: "\u7A7A\u60F3\u306E\u4E16\u754C\u3067\u5192\u967A\u3057\u3066\u3044\u305F", score: [3,0,0,2,3] },
-          { text: "\u65E5\u8A18\u3084\u4F5C\u6587\u3092\u66F8\u304F\u306E\u304C\u597D\u304D\u3060\u3063\u305F", score: [2,2,1,2,1] },
-          { text: "\u4EBA\u306E\u884C\u52D5\u3092\u3088\u304F\u89B3\u5BDF\u3057\u3066\u3044\u305F", score: [1,2,3,0,1] },
-          { text: "\u5916\u3067\u904A\u3076\u306E\u304C\u597D\u304D\u3060\u3063\u305F", score: [0,0,0,1,0] },
+          { text: "空想の世界で冒険していた", score: [3,0,0,2,3] },
+          { text: "日記や作文を書くのが好きだった", score: [2,2,1,2,1] },
+          { text: "人の行動をよく観察していた", score: [1,2,3,0,1] },
+          { text: "外で遊ぶのが好きだった", score: [0,0,0,1,0] },
         ],
       },
       {
-        id: 9, text: "\u6620\u753B\u3084\u30C9\u30E9\u30DE\u3092\u89B3\u3066\u3044\u3066\u3001\u3064\u3044\u8003\u3048\u3066\u3057\u307E\u3046\u3053\u3068\u306F\uFF1F",
+        id: 9, text: "映画やドラマを観ていて、つい考えてしまうことは？",
         options: [
-          { text: "\u300C\u81EA\u5206\u306A\u3089\u3053\u306E\u811A\u672C\u3092\u3053\u3046\u66F8\u304D\u63DB\u3048\u308B\u300D", score: [3,2,1,1,2] },
-          { text: "\u300C\u3053\u306E\u30AD\u30E3\u30E9\u306E\u904E\u53BB\u306B\u306F\u4F55\u304C\u3042\u3063\u305F\u3093\u3060\u308D\u3046\u300D", score: [2,1,3,1,2] },
-          { text: "\u611F\u60C5\u79FB\u5165\u3057\u3059\u304E\u3066\u6CE3\u304F or \u6012\u308B", score: [1,0,1,3,1] },
-          { text: "\u7D14\u7C8B\u306B\u697D\u3057\u3093\u3067\u3044\u308B", score: [0,0,0,1,0] },
+          { text: "「自分ならこの脚本をこう書き換える」", score: [3,2,1,1,2] },
+          { text: "「このキャラの過去には何があったんだろう」", score: [2,1,3,1,2] },
+          { text: "感情移入しすぎて泣く or 怒る", score: [1,0,1,3,1] },
+          { text: "純粋に楽しんでいる", score: [0,0,0,1,0] },
         ],
       },
       {
-        id: 10, text: "SNS\u306B\u6295\u7A3F\u3059\u308B\u3068\u304D\u3001\u6700\u3082\u6642\u9593\u3092\u304B\u3051\u308B\u306E\u306F\uFF1F",
+        id: 10, text: "SNSに投稿するとき、最も時間をかけるのは？",
         options: [
-          { text: "\u6587\u7AE0\u306E\u8A00\u3044\u56DE\u3057\u3092\u4F55\u5EA6\u3082\u63A8\u6572\u3059\u308B", score: [2,3,1,1,1] },
-          { text: "\u9762\u767D\u3044\u30A8\u30D4\u30BD\u30FC\u30C9\u3092\u76DB\u3063\u3066\u66F8\u304F", score: [2,0,1,2,3] },
-          { text: "\u6295\u7A3F\u3057\u305F\u5F8C\u306B\u300C\u3042\u306E\u8868\u73FE\u306E\u307B\u3046\u304C\u3088\u304B\u3063\u305F\u300D\u3068\u5F8C\u6094\u3059\u308B", score: [2,2,1,2,1] },
-          { text: "\u3042\u307E\u308ASNS\u306F\u4F7F\u308F\u306A\u3044 or \u9069\u5F53\u306B\u6295\u7A3F\u3059\u308B", score: [0,0,0,0,0] },
+          { text: "文章の言い回しを何度も推敲する", score: [2,3,1,1,1] },
+          { text: "面白いエピソードを盛って書く", score: [2,0,1,2,3] },
+          { text: "投稿した後に「あの表現のほうがよかった」と後悔する", score: [2,2,1,2,1] },
+          { text: "あまりSNSは使わない or 適当に投稿する", score: [0,0,0,0,0] },
         ],
       },
       {
-        id: 11, text: "\u521D\u5BFE\u9762\u306E\u4EBA\u3068\u4F1A\u3063\u305F\u3068\u304D\u3001\u7121\u610F\u8B58\u306B\u3057\u3066\u3044\u308B\u3053\u3068\u306F\uFF1F",
+        id: 11, text: "初対面の人と会ったとき、無意識にしていることは？",
         options: [
-          { text: "\u3053\u306E\u4EBA\u3092\u5C0F\u8AAC\u306E\u30AD\u30E3\u30E9\u306B\u3057\u305F\u3089\u3069\u3093\u306A\u8A2D\u5B9A\u3060\u308D\u3046\u3068\u8003\u3048\u308B", score: [3,1,2,0,3] },
-          { text: "\u8A71\u3057\u65B9\u3084\u4ED5\u8349\u306E\u7656\u3092\u89B3\u5BDF\u3057\u3066\u3044\u308B", score: [1,2,3,0,1] },
-          { text: "\u76F8\u624B\u306E\u611F\u60C5\u3092\u654F\u611F\u306B\u5BDF\u77E5\u3057\u3066\u3044\u308B", score: [1,1,2,3,0] },
-          { text: "\u666E\u901A\u306B\u4F1A\u8A71\u3057\u3066\u3044\u308B", score: [0,0,0,0,0] },
+          { text: "この人を小説のキャラにしたらどんな設定だろうと考える", score: [3,1,2,0,3] },
+          { text: "話し方や仕草の癖を観察している", score: [1,2,3,0,1] },
+          { text: "相手の感情を敏感に察知している", score: [1,1,2,3,0] },
+          { text: "普通に会話している", score: [0,0,0,0,0] },
         ],
       },
       {
-        id: 12, text: "\u6700\u5F8C\u306E\u8CEA\u554F\u3002\u3042\u306A\u305F\u304C\u6700\u3082\u5171\u611F\u3059\u308B\u8A00\u8449\u306F\uFF1F",
+        id: 12, text: "最も共感する言葉は？",
         options: [
-          { text: "\u300C\u66F8\u304B\u305A\u306B\u306F\u3044\u3089\u308C\u306A\u3044\u300D", score: [3,1,1,3,2] },
-          { text: "\u300C\u7269\u8A9E\u306F\u4EBA\u9593\u3092\u7406\u89E3\u3059\u308B\u305F\u3081\u306E\u9053\u5177\u3060\u300D", score: [2,3,3,1,1] },
-          { text: "\u300C\u73FE\u5B9F\u3088\u308A\u9762\u767D\u3044\u4E16\u754C\u304C\u982D\u306E\u4E2D\u306B\u3042\u308B\u300D", score: [2,0,0,2,3] },
-          { text: "\u300C\u5225\u306B\u3069\u308C\u3082\u30D4\u30F3\u3068\u3053\u306A\u3044\u300D", score: [0,0,0,0,0] },
+          { text: "「書かずにはいられない」", score: [3,1,1,3,2] },
+          { text: "「物語は人間を理解するための道具だ」", score: [2,3,3,1,1] },
+          { text: "「現実より面白い世界が頭の中にある」", score: [2,0,0,2,3] },
+          { text: "「別にどれもピンとこない」", score: [0,0,0,0,0] },
+        ],
+      },
+      // ===== 追加の18問 =====
+      {
+        id: 13, text: "カフェで隣の席のカップルが喧嘩している。あなたは？",
+        options: [
+          { text: "二人の関係性と喧嘩の原因を推理し始める", score: [2,1,3,1,2] },
+          { text: "「この場面、小説に使えるな」と思う", score: [3,1,1,0,2] },
+          { text: "なんだか自分まで悲しくなってくる", score: [0,0,1,3,0] },
+          { text: "気にせず自分のことをする", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 14, text: "旅行先で一番楽しみにしていることは？",
+        options: [
+          { text: "見知らぬ街の路地裏や地元の人の生活を覗くこと", score: [1,0,3,1,2] },
+          { text: "旅行記やエッセイを書くためのネタ集め", score: [2,2,2,0,1] },
+          { text: "普段と違う場所で感情が揺さぶられること", score: [1,0,1,3,1] },
+          { text: "美味しいものを食べること、観光地を回ること", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 15, text: "自分の日常生活を一言で表すと？",
+        options: [
+          { text: "頭の中は常に複数の物語が同時進行している", score: [2,0,0,1,3] },
+          { text: "何事もスケジュールと段取りが大事", score: [0,3,0,0,0] },
+          { text: "感情のジェットコースターに乗っている感じ", score: [1,0,1,3,1] },
+          { text: "平穏そのもの", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 16, text: "面白い夢を見たとき、起きてからどうする？",
+        options: [
+          { text: "急いでメモして物語の素材にする", score: [3,1,0,1,3] },
+          { text: "夢の構造やストーリーラインを分析する", score: [1,3,1,0,1] },
+          { text: "夢の中で感じた感情を反芻する", score: [1,0,1,3,1] },
+          { text: "すぐ忘れる", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 17, text: "好きな音楽を聴いているとき、頭の中では？",
+        options: [
+          { text: "その曲に合う映画のワンシーンが浮かぶ", score: [3,0,0,2,3] },
+          { text: "歌詞の伏線や構成の巧さに注目する", score: [1,3,1,0,1] },
+          { text: "歌詞に共感して泣きそうになる", score: [0,0,1,3,0] },
+          { text: "リズムに乗って楽しんでいる", score: [0,0,0,1,0] },
+        ],
+      },
+      {
+        id: 18, text: "道端で見知らぬおじいさんが一人でベンチに座っている。あなたは？",
+        options: [
+          { text: "この人のこれまでの人生を勝手に想像する", score: [2,0,2,1,3] },
+          { text: "何を思って座っているのか、表情から読み取ろうとする", score: [1,1,3,1,1] },
+          { text: "なんだか胸がキュッとなる", score: [0,0,1,3,0] },
+          { text: "特に何も思わない", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 19, text: "文章を書くとき、最も大事にしていることは？",
+        options: [
+          { text: "勢いとリズム。考えるより先に手が動く", score: [3,0,0,2,2] },
+          { text: "構成。全体の流れと論理的な整合性", score: [0,3,1,0,0] },
+          { text: "読んだ人がどう感じるか", score: [1,1,2,3,1] },
+          { text: "文章を書く機会があまりない", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 20, text: "ニュースを見たとき、まず気になるのは？",
+        options: [
+          { text: "事件の当事者がどんな気持ちだったのか", score: [1,0,2,3,1] },
+          { text: "事件の背景にある社会構造や因果関係", score: [1,3,2,0,0] },
+          { text: "「もし自分がその場にいたら」とシミュレーションする", score: [2,1,1,1,3] },
+          { text: "事実だけ確認して終わり", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 21, text: "休日の過ごし方で一番近いのは？",
+        options: [
+          { text: "一日中妄想に浸っていたら夕方になっていた", score: [2,0,0,1,3] },
+          { text: "読書や映画鑑賞で物語をインプットする", score: [2,2,2,2,1] },
+          { text: "人間観察ができるカフェや街に出かける", score: [1,0,3,0,1] },
+          { text: "友達と遊ぶ or 家でゆっくりする", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 22, text: "自分の感情を一番うまく表現できる方法は？",
+        options: [
+          { text: "文章にする。話すより書くほうが得意", score: [3,1,1,2,1] },
+          { text: "図や構造で整理する", score: [0,3,1,0,0] },
+          { text: "音楽や絵など、言葉以外で表現する", score: [1,0,0,3,2] },
+          { text: "あまり表現しない", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 23, text: "「もし〇〇だったら」という空想をするのは？",
+        options: [
+          { text: "毎日のようにしている", score: [2,0,0,1,3] },
+          { text: "時々。面白い設定を思いつくと止まらない", score: [3,1,1,1,2] },
+          { text: "あまりしないが、本や映画の世界にはよく没入する", score: [1,1,1,2,1] },
+          { text: "ほとんどしない", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 24, text: "友達から悩み相談を受けたとき、あなたの反応は？",
+        options: [
+          { text: "相手の立場に立って、気持ちを想像しながら聞く", score: [1,0,2,3,1] },
+          { text: "問題を整理して、解決策を一緒に考える", score: [0,3,1,0,0] },
+          { text: "「それ、物語みたいだね」と思ってしまう自分がいる", score: [2,0,1,0,3] },
+          { text: "うまく返せなくて困ることが多い", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 25, text: "自分が書いた文章を読み返すとき、どう感じる？",
+        options: [
+          { text: "「天才かも」と「ゴミだ」を5分おきに繰り返す", score: [3,0,0,3,2] },
+          { text: "改善点を冷静に分析して赤ペンを入れる", score: [0,3,1,0,0] },
+          { text: "当時の感情が蘇ってきて感慨深い", score: [1,0,1,3,1] },
+          { text: "あまり文章を書かないので経験がない", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 26, text: "他人の秘密を知ってしまったとき、最初に考えることは？",
+        options: [
+          { text: "その秘密の裏にある物語が気になる", score: [2,1,2,0,3] },
+          { text: "知ってしまった情報をどう扱うべきか整理する", score: [0,3,1,0,0] },
+          { text: "相手の気持ちを思うと胸が苦しくなる", score: [0,0,2,3,0] },
+          { text: "忘れるようにする", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 27, text: "古い写真を見たとき、あなたは？",
+        options: [
+          { text: "写真に写っていない「その後」の物語を想像する", score: [3,0,1,1,3] },
+          { text: "撮影された時代背景や状況を推理する", score: [1,3,2,0,1] },
+          { text: "当時の空気感や感情が蘇って切なくなる", score: [0,0,1,3,1] },
+          { text: "「懐かしいな」で終わる", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 28, text: "退屈な会議や授業中、あなたの頭の中は？",
+        options: [
+          { text: "まったく別の物語の世界に飛んでいる", score: [2,0,0,0,3] },
+          { text: "話の論理的な矛盾点を見つけてしまう", score: [0,3,2,0,0] },
+          { text: "周りの人の仕草や表情を観察している", score: [1,0,3,1,1] },
+          { text: "眠気と戦っている", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 29, text: "感動する映画のラストシーンで、あなたは？",
+        options: [
+          { text: "「自分ならこの結末をもっと良くできる」と考える", score: [3,2,0,1,2] },
+          { text: "伏線回収の見事さに感嘆する", score: [1,3,1,1,0] },
+          { text: "泣きすぎてしばらく動けない", score: [0,0,0,3,0] },
+          { text: "「いい映画だったな」と思って終わり", score: [0,0,0,0,0] },
+        ],
+      },
+      {
+        id: 30, text: "寝る前の布団の中で、何をしている？",
+        options: [
+          { text: "頭の中で物語の続きを展開させている", score: [3,0,0,1,3] },
+          { text: "今日の出来事を物語として再構成している", score: [2,2,1,1,2] },
+          { text: "感情が溢れて、急に泣いたり笑ったりする", score: [0,0,0,3,1] },
+          { text: "すぐ寝る", score: [0,0,0,0,0] },
         ],
       },
     ];
 
-    const RESULTS = [
+    // ========== 30問からランダムに12問を選ぶ ==========
+    function selectRandomQuestions(allQuestions, count) {
+      var shuffled = allQuestions.slice();
+      for (var i = shuffled.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = shuffled[i];
+        shuffled[i] = shuffled[j];
+        shuffled[j] = temp;
+      }
+      return shuffled.slice(0, count);
+    }
+
+    // ========== 結果タイプ ==========
+    var RESULTS = [
       {
-        type: "\u5929\u624D\u808C\u306E\u76F4\u611F\u578B\u5C0F\u8AAC\u5BB6", emoji: "\u26A1", suited: true, percentage: 92,
-        description: "\u3042\u306A\u305F\u306E\u8133\u306F\u7269\u8A9E\u751F\u6210\u30DE\u30B7\u30F3\u3067\u3059\u3002\u65E5\u5E38\u306E\u4E9B\u7D30\u306A\u51FA\u6765\u4E8B\u304B\u3089\u58EE\u5927\u306A\u30B9\u30C8\u30FC\u30EA\u30FC\u3092\u7D21\u304E\u51FA\u3059\u5929\u6027\u306E\u624D\u80FD\u304C\u3042\u308A\u307E\u3059\u3002\u8AD6\u7406\u3088\u308A\u76F4\u611F\u3001\u8A08\u753B\u3088\u308A\u885D\u52D5\u3002\u3042\u306A\u305F\u304C\u66F8\u304F\u7269\u8A9E\u306F\u3001\u8AAD\u8005\u306E\u4E88\u60F3\u3092\u88CF\u5207\u308B\u5C55\u958B\u3067\u5FC3\u3092\u638C\u3080\u3067\u3057\u3087\u3046\u3002",
-        advice: "\u8003\u3048\u308B\u524D\u306B\u66F8\u304D\u59CB\u3081\u3066\u304F\u3060\u3055\u3044\u3002\u3042\u306A\u305F\u306E\u76F4\u611F\u304C\u6700\u9AD8\u306E\u30D7\u30ED\u30C3\u30C8\u3092\u751F\u307F\u51FA\u3057\u307E\u3059\u3002",
-        writers: "\u592A\u5BB0\u6CBB\u3001\u30AB\u30FC\u30C8\u30FB\u30F4\u30A9\u30CD\u30AC\u30C3\u30C8\u3001\u6751\u7530\u6C99\u8036\u9999", color: "#FF6B35",
+        type: "天才肌の直感型小説家", emoji: "\u26A1", suited: true, percentage: 92,
+        description: "あなたの脳は物語生成マシンです。日常の些細な出来事から壮大なストーリーを紡ぎ出す天性の才能があります。論理より直感、計画より衝動。あなたが書く物語は、読者の予想を裏切る展開で心を掴むでしょう。",
+        advice: "考える前に書き始めてください。あなたの直感が最高のプロットを生み出します。",
+        writers: "太宰治、カート・ヴォネガット、村田沙耶香", color: "#FF6B35",
+        book: { title: "人間失格", author: "太宰治", url: "https://www.amazon.co.jp/dp/B009GXMB0O", desc: "直感と衝動で生きた太宰の代表作。あなたの感性に響くはず。" },
       },
       {
-        type: "\u7DFB\u5BC6\u306A\u69CB\u6210\u578B\u5C0F\u8AAC\u5BB6", emoji: "\uD83E\uDDE9", suited: true, percentage: 87,
-        description: "\u3042\u306A\u305F\u306F\u7269\u8A9E\u306E\u8A2D\u8A08\u56F3\u3092\u63CF\u3051\u308B\u7A00\u6709\u306A\u4EBA\u9593\u3067\u3059\u3002\u4F0F\u7DDA\u306E\u914D\u7F6E\u3001\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u30A2\u30FC\u30AF\u3001\u30D7\u30ED\u30C3\u30C8\u69CB\u9020\u2014\u2014\u3059\u3079\u3066\u3092\u8A08\u7B97\u3057\u5C3D\u304F\u3057\u305F\u7CBE\u5BC6\u306A\u7269\u8A9E\u3092\u69CB\u7BC9\u3067\u304D\u307E\u3059\u3002\u30DF\u30B9\u30C6\u30EA\u30FC\u3084\u58EE\u5927\u306ASF\u304C\u7279\u306B\u5411\u3044\u3066\u3044\u307E\u3059\u3002",
-        advice: "\u307E\u305A\u30D7\u30ED\u30C3\u30C8\u3092\u69CB\u9020\u5316\u3057\u3001\u5404\u7AE0\u306E\u5F79\u5272\u3092\u660E\u78BA\u306B\u3057\u3066\u304B\u3089\u66F8\u304D\u59CB\u3081\u308B\u3068\u771F\u4FA1\u3092\u767A\u63EE\u3057\u307E\u3059\u3002",
-        writers: "\u5BAE\u90E8\u307F\u3086\u304D\u3001\u4F0A\u5742\u5E78\u592A\u90CE\u3001\u30A2\u30AC\u30B5\u30FB\u30AF\u30EA\u30B9\u30C6\u30A3", color: "#4ECDC4",
+        type: "緻密な構成型小説家", emoji: "\uD83E\uDDE9", suited: true, percentage: 87,
+        description: "あなたは物語の設計図を描ける稀有な人間です。伏線の配置、キャラクターアーク、プロット構造——すべてを計算し尽くした精密な物語を構築できます。ミステリーや壮大なSFが特に向いています。",
+        advice: "まずプロットを構造化し、各章の役割を明確にしてから書き始めると真価を発揮します。",
+        writers: "宮部みゆき、伊坂幸太郎、アガサ・クリスティ", color: "#4ECDC4",
+        book: { title: "十角館の殺人", author: "綾辻行人", url: "https://www.amazon.co.jp/dp/B009GXLWZQ", desc: "精巧なプロット構成の教科書。構成力を磨きたいあなたに。" },
       },
       {
-        type: "\u4EBA\u9593\u89B3\u5BDF\u306E\u9054\u4EBA\u578B\u5C0F\u8AAC\u5BB6", emoji: "\uD83D\uDC41\uFE0F", suited: true, percentage: 89,
-        description: "\u3042\u306A\u305F\u306F\u4EBA\u9593\u3068\u3044\u3046\u751F\u304D\u7269\u3092\u6DF1\u304F\u7406\u89E3\u3057\u3066\u3044\u307E\u3059\u3002\u8868\u60C5\u306E\u5FAE\u5999\u306A\u5909\u5316\u3001\u58F0\u306E\u30C8\u30FC\u30F3\u3001\u8A00\u8449\u306E\u88CF\u306B\u96A0\u3055\u308C\u305F\u672C\u97F3\u2014\u2014\u305D\u306E\u6D1E\u5BDF\u529B\u306F\u5C0F\u8AAC\u5BB6\u306B\u3068\u3063\u3066\u6700\u5F37\u306E\u6B66\u5668\u3067\u3059\u3002\u30EA\u30A2\u30EA\u30C6\u30A3\u306E\u3042\u308B\u30AD\u30E3\u30E9\u30AF\u30BF\u30FC\u3092\u63CF\u304B\u305B\u305F\u3089\u53F3\u306B\u51FA\u308B\u8005\u306F\u3044\u307E\u305B\u3093\u3002",
-        advice: "\u30AB\u30D5\u30A7\u306B\u5EA7\u3063\u3066\u9053\u884C\u304F\u4EBA\u3092\u89B3\u5BDF\u3059\u308B\u6642\u9593\u3092\u4F5C\u3063\u3066\u304F\u3060\u3055\u3044\u3002\u305D\u308C\u304C\u3042\u306A\u305F\u306E\u6700\u9AD8\u306E\u53D6\u6750\u3067\u3059\u3002",
-        writers: "\u5411\u7530\u90A6\u5B50\u3001\u4E09\u6D66\u3057\u3092\u3093\u3001\u30EC\u30A4\u30E2\u30F3\u30C9\u30FB\u30AB\u30FC\u30F4\u30A1\u30FC", color: "#9B59B6",
+        type: "人間観察の達人型小説家", emoji: "\uD83D\uDC41\uFE0F", suited: true, percentage: 89,
+        description: "あなたは人間という生き物を深く理解しています。表情の微妙な変化、声のトーン、言葉の裏に隠された本音——その洞察力は小説家にとって最強の武器です。リアリティのあるキャラクターを描かせたら右に出る者はいません。",
+        advice: "カフェに座って道行く人を観察する時間を作ってください。それがあなたの最高の取材です。",
+        writers: "向田邦子、三浦しをん、レイモンド・カーヴァー", color: "#9B59B6",
+        book: { title: "夜のピクニック", author: "恩田陸", url: "https://www.amazon.co.jp/dp/B009GXMA2U", desc: "繊細な人間観察が光る青春小説。観察眼を持つあなたなら深く共感できるはず。" },
       },
       {
-        type: "\u611F\u60C5\u7206\u767A\u578B\u5C0F\u8AAC\u5BB6", emoji: "\uD83D\uDD25", suited: true, percentage: 85,
-        description: "\u3042\u306A\u305F\u306E\u611F\u53D7\u6027\u306F\u5E38\u4EBA\u306E3\u500D\u3067\u3059\u3002\u559C\u6012\u54C0\u697D\u304C\u6FC0\u3057\u304F\u3001\u305D\u306E\u6EA2\u308C\u51FA\u308B\u611F\u60C5\u3053\u305D\u304C\u8AAD\u8005\u306E\u5FC3\u3092\u63FA\u3055\u3076\u308B\u539F\u52D5\u529B\u306B\u306A\u308A\u307E\u3059\u3002\u3042\u306A\u305F\u306E\u66F8\u304F\u6587\u7AE0\u306B\u306F\u300C\u4F53\u6E29\u300D\u304C\u3042\u308A\u3001\u8AAD\u8005\u306F\u601D\u308F\u305A\u6D99\u3059\u308B\u3067\u3057\u3087\u3046\u3002",
-        advice: "\u611F\u60C5\u304C\u9AD8\u3076\u3063\u305F\u77AC\u9593\u306B\u3059\u3050\u66F8\u304D\u59CB\u3081\u3066\u304F\u3060\u3055\u3044\u3002\u305D\u306E\u751F\u3005\u3057\u3055\u304C\u6700\u5927\u306E\u6B66\u5668\u3067\u3059\u3002",
-        writers: "\u4E2D\u539F\u4E2D\u4E5F\u3001\u3088\u3057\u3082\u3068\u3070\u306A\u306A\u3001\u30C9\u30B9\u30C8\u30A8\u30D5\u30B9\u30AD\u30FC", color: "#E74C3C",
+        type: "感情爆発型小説家", emoji: "\uD83D\uDD25", suited: true, percentage: 85,
+        description: "あなたの感受性は常人の3倍です。喜怒哀楽が激しく、その溢れ出る感情こそが読者の心を揺さぶる原動力になります。あなたの書く文章には「体温」があり、読者は思わず涙するでしょう。",
+        advice: "感情が高ぶった瞬間にすぐ書き始めてください。その生々しさが最大の武器です。",
+        writers: "中原中也、よしもとばなな、ドストエフスキー", color: "#E74C3C",
+        book: { title: "キッチン", author: "よしもとばなな", url: "https://www.amazon.co.jp/dp/B009IXG5JU", desc: "感情の機微を繊細に描いた名作。感受性豊かなあなたの心に刺さる一冊。" },
       },
       {
-        type: "\u5984\u60F3\u529B\u5168\u958B\u578B\u5C0F\u8AAC\u5BB6", emoji: "\uD83C\uDF00", suited: true, percentage: 94,
-        description: "\u3042\u306A\u305F\u306E\u982D\u306E\u4E2D\u306B\u306F\u7121\u9650\u306E\u5B87\u5B99\u304C\u5E83\u304C\u3063\u3066\u3044\u307E\u3059\u3002\u73FE\u5B9F\u3068\u7A7A\u60F3\u306E\u5883\u754C\u304C\u66D6\u6627\u3067\u3001\u5E38\u306B\u300C\u3082\u3046\u4E00\u3064\u306E\u4E16\u754C\u300D\u306B\u7247\u8DB3\u3092\u7A81\u3063\u8FBC\u3093\u3067\u3044\u308B\u72B6\u614B\u3002\u30D5\u30A1\u30F3\u30BF\u30B8\u30FC\u3001SF\u3001\u4E0D\u601D\u8B70\u306A\u6587\u5B66\u2014\u2014\u3042\u306A\u305F\u306B\u3057\u304B\u66F8\u3051\u306A\u3044\u4E16\u754C\u304C\u3042\u308A\u307E\u3059\u3002",
-        advice: "\u5984\u60F3\u3092\u30CE\u30FC\u30C8\u306B\u66F8\u304D\u6E9C\u3081\u3066\u304F\u3060\u3055\u3044\u3002\u3042\u306A\u305F\u306E\u8133\u5185\u4E16\u754C\u306F\u3001\u305D\u306E\u307E\u307E\u58F2\u308C\u308B\u5C0F\u8AAC\u306E\u30CD\u30BF\u3067\u3059\u3002",
-        writers: "\u661F\u65B0\u4E00\u3001\u6751\u4E0A\u6625\u6A39\u3001\u30AC\u30D6\u30EA\u30A8\u30EB\u30FB\u30AC\u30EB\u30B7\u30A2\uFF1D\u30DE\u30EB\u30B1\u30B9", color: "#3498DB",
+        type: "妄想力全開型小説家", emoji: "\uD83C\uDF00", suited: true, percentage: 94,
+        description: "あなたの頭の中には無限の宇宙が広がっています。現実と空想の境界が曖昧で、常に「もう一つの世界」に片足を突っ込んでいる状態。ファンタジー、SF、不思議な文学——あなたにしか書けない世界があります。",
+        advice: "妄想をノートに書き溜めてください。あなたの脳内世界は、そのまま売れる小説のネタです。",
+        writers: "星新一、村上春樹、ガブリエル・ガルシア＝マルケス", color: "#3498DB",
+        book: { title: "ボッコちゃん", author: "星新一", url: "https://www.amazon.co.jp/dp/B009GXMA8Y", desc: "ショートショートの名手。妄想力を物語にする技術が詰まった一冊。" },
       },
       {
-        type: "\u6F5C\u5728\u80FD\u529B\u899A\u9192\u5F85\u3061\u578B", emoji: "\uD83C\uDF31", suited: false, percentage: 45,
-        description: "\u73FE\u6642\u70B9\u3067\u306F\u5C0F\u8AAC\u5BB6\u306E\u8CC7\u8CEA\u306F\u307E\u3060\u7720\u3063\u3066\u3044\u308B\u6BB5\u968E\u3067\u3059\u3002\u3057\u304B\u3057\u5B89\u5FC3\u3057\u3066\u304F\u3060\u3055\u3044\u3002\u591A\u304F\u306E\u5049\u5927\u306A\u4F5C\u5BB6\u3082\u3001\u6700\u521D\u306F\u300C\u81EA\u5206\u306B\u624D\u80FD\u304C\u3042\u308B\u300D\u306A\u3093\u3066\u601D\u3063\u3066\u3044\u307E\u305B\u3093\u3067\u3057\u305F\u3002\u3042\u306A\u305F\u306B\u5FC5\u8981\u306A\u306E\u306F\u3001\u66F8\u304D\u59CB\u3081\u308B\u304D\u3063\u304B\u3051\u3060\u3051\u3067\u3059\u3002",
-        advice: "\u307E\u305A\u306F1\u65E55\u5206\u3001\u601D\u3063\u305F\u3053\u3068\u3092\u66F8\u304F\u7FD2\u6163\u304B\u3089\u59CB\u3081\u3066\u307F\u3066\u304F\u3060\u3055\u3044\u3002\u624D\u80FD\u306F\u66F8\u304F\u3053\u3068\u3067\u76EE\u899A\u3081\u307E\u3059\u3002",
-        writers: "\u3042\u306A\u305F\u306F\u307E\u3060\u898B\u306C\u65B0\u3057\u3044\u30BF\u30A4\u30D7\u306E\u4F5C\u5BB6\u304B\u3082\u3057\u308C\u307E\u305B\u3093", color: "#95A5A6",
+        type: "潜在能力覚醒待ち型", emoji: "\uD83C\uDF31", suited: false, percentage: 45,
+        description: "現時点では小説家の資質はまだ眠っている段階です。しかし安心してください。多くの偉大な作家も、最初は「自分に才能がある」なんて思っていませんでした。あなたに必要なのは、書き始めるきっかけだけです。",
+        advice: "まずは1日5分、思ったことを書く習慣から始めてみてください。才能は書くことで目覚めます。",
+        writers: "あなたはまだ見ぬ新しいタイプの作家かもしれません", color: "#95A5A6",
+        book: { title: "書くことについて", author: "スティーヴン・キング", url: "https://www.amazon.co.jp/dp/4094087648", desc: "キングが語る創作論。才能の開花を待つあなたへの最高の手引書。" },
       },
       {
-        type: "\u7DE8\u96C6\u8005\u30FB\u6279\u8A55\u5BB6\u30BF\u30A4\u30D7", emoji: "\uD83D\uDCDD", suited: false, percentage: 32,
-        description: "\u3042\u306A\u305F\u306E\u624D\u80FD\u306F\u300C\u66F8\u304F\u300D\u3053\u3068\u3088\u308A\u300C\u898B\u629C\u304F\u300D\u3053\u3068\u306B\u3042\u308A\u307E\u3059\u3002\u4F5C\u54C1\u306E\u826F\u3057\u60AA\u3057\u3092\u7684\u78BA\u306B\u5224\u65AD\u3057\u3001\u6539\u5584\u70B9\u3092\u898B\u3064\u3051\u51FA\u3059\u92ED\u3044\u76EE\u3092\u6301\u3063\u3066\u3044\u307E\u3059\u3002\u5C0F\u8AAC\u5BB6\u3088\u308A\u7DE8\u96C6\u8005\u3084\u30D6\u30C3\u30AF\u30EC\u30D3\u30E5\u30A2\u30FC\u3068\u3057\u3066\u8F1D\u304F\u304B\u3082\u3057\u308C\u307E\u305B\u3093\u3002",
-        advice: "\u3082\u3057\u66F8\u304F\u306A\u3089\u3001\u307E\u305A\u5927\u91CF\u306B\u8AAD\u3093\u3067\u304B\u3089\u3002\u3042\u306A\u305F\u306E\u5206\u6790\u529B\u306F\u3001\u66F8\u304F\u7D4C\u9A13\u3068\u639B\u3051\u5408\u308F\u305B\u308B\u3068\u6700\u5F37\u3067\u3059\u3002",
-        writers: "\u6279\u8A55\u5BB6\u3068\u3057\u3066\uFF1A\u5C0F\u6797\u79C0\u96C4\u3001\u67C4\u8C37\u884C\u4EBA", color: "#7F8C8D",
+        type: "編集者・批評家タイプ", emoji: "\uD83D\uDCDD", suited: false, percentage: 32,
+        description: "あなたの才能は「書く」ことより「見抜く」ことにあります。作品の良し悪しを的確に判断し、改善点を見つけ出す鋭い目を持っています。小説家より編集者やブックレビュアーとして輝くかもしれません。",
+        advice: "もし書くなら、まず大量に読んでから。あなたの分析力は、書く経験と掛け合わせると最強です。",
+        writers: "批評家として：小林秀雄、柄谷行人", color: "#7F8C8D",
+        book: { title: "読書について", author: "ショウペンハウエル", url: "https://www.amazon.co.jp/dp/4003363221", desc: "「読む」ことの本質を問う名著。分析力に長けたあなたにこそ読んでほしい。" },
       },
     ];
 
-    function getResult(answers) {
-      const scores = [0, 0, 0, 0, 0];
+    function getResult(answers, selectedQuestions) {
+      var scores = [0, 0, 0, 0, 0];
       answers.forEach(function(a) {
-        var q = QUESTIONS[a.questionIndex];
+        var q = selectedQuestions[a.questionIndex];
         var option = q.options[a.optionIndex];
         option.score.forEach(function(s, i) { scores[i] += s; });
       });
@@ -304,7 +489,7 @@
             たった12の質問で、あなたの中に眠る<br />「物語を紡ぐ才能」を科学的(?)に診断します。
           </p>
           <p style={{ fontSize: '0.72rem', color: '#666', marginBottom: '2.5rem', fontStyle: 'italic' }}>
-            ※ 診断時間：約3〜5分 ／ 累計診断数 284,927人（嘘）
+            ※ 診断時間：約3〜5分 ／ 毎回異なる問題が出題されます
           </p>
           <button onClick={props.onStart} style={{
             background: 'linear-gradient(135deg, #FF6B35, #FF8C42)', color: '#fff', border: 'none',
@@ -401,7 +586,6 @@
     }
 
     // ========== 広告スロット ==========
-    // 忍者AdMax または AdSense のコードをここに設置
     function AdSlot(props) {
       var slotId = props.id || 'ad-slot';
       return (
@@ -411,24 +595,14 @@
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: '1px dashed rgba(255,255,255,0.06)', overflow: 'hidden',
         }}>
-          {/* ここに広告コードを貼り付け */}
           <span style={{ fontSize: '0.7rem', color: '#333' }}>AD</span>
         </div>
       );
     }
 
-    // ========== おすすめ書籍（Amazonアソシエイト用） ==========
-    var BOOK_RECOMMENDATIONS = {
-      0: { title: '人間失格', author: '太宰治', url: 'https://www.amazon.co.jp/dp/B009GXMB0O' },
-      1: { title: '十角館の殺人', author: '綾辻行人', url: 'https://www.amazon.co.jp/dp/B009GXLWZQ' },
-      2: { title: '夜のピクニック', author: '恩田陸', url: 'https://www.amazon.co.jp/dp/B009GXMA2U' },
-      3: { title: 'ノルウェイの森', author: '村上春樹', url: 'https://www.amazon.co.jp/dp/B009GXMFPC' },
-      4: { title: '星新一 ショートショート傑作選', author: '星新一', url: 'https://www.amazon.co.jp/dp/B009GXMB0O' },
-    };
-
+    // ========== おすすめ書籍（結果に直接紐づけ） ==========
     function BookRecommendation(props) {
-      var resultIndex = props.resultIndex;
-      var book = BOOK_RECOMMENDATIONS[resultIndex];
+      var book = props.book;
       if (!book) return null;
       return (
         <a href={book.url} target="_blank" rel="noopener noreferrer nofollow" style={{
@@ -441,9 +615,13 @@
           </div>
           <div style={{ fontSize: '0.95rem', color: '#ddd', marginBottom: '0.3rem' }}>
             {book.title}
+            <span style={{ fontSize: '0.8rem', color: '#999', marginLeft: '0.5rem' }}>/ {book.author}</span>
           </div>
-          <div style={{ fontSize: '0.78rem', color: '#888' }}>
-            {book.author} ／ Amazon で見る →
+          <div style={{ fontSize: '0.82rem', color: '#aaa', lineHeight: 1.6, marginTop: '0.4rem' }}>
+            {book.desc}
+          </div>
+          <div style={{ fontSize: '0.78rem', color: '#FF6B35', marginTop: '0.5rem' }}>
+            Amazon で見る →
           </div>
         </a>
       );
@@ -519,11 +697,11 @@
             </div>
           </div>
 
-          {/* 広告スロット（結果カードの下 = 最も見られる位置） */}
+          {/* 広告スロット */}
           <AdSlot id="ad-result" />
 
-          {/* おすすめ書籍（Amazonアソシエイト） */}
-          <BookRecommendation resultIndex={RESULTS.indexOf(result)} />
+          {/* おすすめ書籍（結果から直接取得） */}
+          <BookRecommendation book={result.book} />
 
           <div style={{ display: 'flex', gap: '0.8rem', width: '100%', marginBottom: '1rem', animation: 'fadeInUp 0.8s ease-out 0.3s backwards' }}>
             <button onClick={handleShare} style={{
@@ -584,28 +762,39 @@
       var answers = ref3[0]; var setAnswers = ref3[1];
       var ref4 = useState(null);
       var result = ref4[0]; var setResult = ref4[1];
+      var ref5 = useState([]);
+      var selectedQuestions = ref5[0]; var setSelectedQuestions = ref5[1];
 
-      var handleStart = function() { setScreen('question'); setCurrentQuestion(0); setAnswers([]); };
+      var QUIZ_COUNT = 12;
+
+      var handleStart = function() {
+        var picked = selectRandomQuestions(ALL_QUESTIONS, QUIZ_COUNT);
+        setSelectedQuestions(picked);
+        setCurrentQuestion(0);
+        setAnswers([]);
+        setResult(null);
+        setScreen('question');
+      };
 
       var handleAnswer = function(optionIndex) {
         var newAnswers = answers.concat([{ questionIndex: currentQuestion, optionIndex: optionIndex }]);
         setAnswers(newAnswers);
-        if (currentQuestion + 1 >= QUESTIONS.length) {
-          setResult(getResult(newAnswers));
+        if (currentQuestion + 1 >= QUIZ_COUNT) {
+          setResult(getResult(newAnswers, selectedQuestions));
           setScreen('result');
         } else {
           setCurrentQuestion(currentQuestion + 1);
         }
       };
 
-      var handleRetry = function() { setScreen('intro'); setCurrentQuestion(0); setAnswers([]); setResult(null); };
+      var handleRetry = function() { setScreen('intro'); setCurrentQuestion(0); setAnswers([]); setResult(null); setSelectedQuestions([]); };
 
       return (
         <div>
           <StarField />
           <div style={{ position: 'relative', zIndex: 1, minHeight: '100vh' }}>
             {screen === 'intro' && <IntroScreen onStart={handleStart} />}
-            {screen === 'question' && <QuestionScreen question={QUESTIONS[currentQuestion]} questionIndex={currentQuestion} total={QUESTIONS.length} onAnswer={handleAnswer} />}
+            {screen === 'question' && selectedQuestions.length > 0 && <QuestionScreen question={selectedQuestions[currentQuestion]} questionIndex={currentQuestion} total={QUIZ_COUNT} onAnswer={handleAnswer} />}
             {screen === 'result' && <ResultScreen result={result} onRetry={handleRetry} />}
           </div>
           <SiteFooter />
