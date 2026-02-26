@@ -16,19 +16,14 @@
   <meta name="twitter:image" content="ogp.png" />
   <meta name="theme-color" content="#0a0a1a" />
 
-  <!-- ========== Google Analytics ==========
-  以下の GA_MEASUREMENT_ID をあなたのIDに置き換えてください。
-  Google Analytics アカウント作成: https://analytics.google.com
-  -->
-  <!--
-  <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-4RZ4QG8LLJ"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-    gtag('config', 'GA_MEASUREMENT_ID');
+    gtag('config', 'G-4RZ4QG8LLJ');
   </script>
-  -->
 
   <!-- ========== Google AdSense ==========
   審査通過後、以下の YOUR_ADSENSE_ID をあなたのIDに置き換えて
@@ -85,7 +80,7 @@
 <body>
   <div id="root"></div>
   <script type="text/babel">
-    const { useState, useMemo } = React;
+    const { useState, useMemo, useEffect, useRef } = React;
 
     // ========== 全30問の質問プール ==========
     // score: [直感型, 構成型, 観察型, 感情型, 妄想型]
@@ -382,49 +377,49 @@
         description: "あなたの脳は物語生成マシンです。日常の些細な出来事から壮大なストーリーを紡ぎ出す天性の才能があります。論理より直感、計画より衝動。あなたが書く物語は、読者の予想を裏切る展開で心を掴むでしょう。",
         advice: "考える前に書き始めてください。あなたの直感が最高のプロットを生み出します。",
         writers: "太宰治、カート・ヴォネガット、村田沙耶香", color: "#FF6B35",
-        book: { title: "人間失格", author: "太宰治", url: "https://www.amazon.co.jp/dp/B009GXMB0O", desc: "直感と衝動で生きた太宰の代表作。あなたの感性に響くはず。" },
+        book: { title: "オルクセン王国史", author: "樽見京一郎", url: "https://amzn.to/4cOAfPd", desc: "「小説家になろう」発、累計100万部突破の異世界戦記。直感と勢いで国を動かすオークの王の物語は、あなたと同じタイプ。" },
       },
       {
         type: "緻密な構成型小説家", emoji: "\uD83E\uDDE9", suited: true, percentage: 87,
         description: "あなたは物語の設計図を描ける稀有な人間です。伏線の配置、キャラクターアーク、プロット構造——すべてを計算し尽くした精密な物語を構築できます。ミステリーや壮大なSFが特に向いています。",
         advice: "まずプロットを構造化し、各章の役割を明確にしてから書き始めると真価を発揮します。",
         writers: "宮部みゆき、伊坂幸太郎、アガサ・クリスティ", color: "#4ECDC4",
-        book: { title: "十角館の殺人", author: "綾辻行人", url: "https://www.amazon.co.jp/dp/B009GXLWZQ", desc: "精巧なプロット構成の教科書。構成力を磨きたいあなたに。" },
+        book: { title: "薬屋のひとりごと", author: "日向夏", url: "https://amzn.to/4kWfD9D", desc: "「小説家になろう」発、累計4000万部突破の宮中ミステリー。緻密な伏線と構成力はまさにあなたの理想形。" },
       },
       {
         type: "人間観察の達人型小説家", emoji: "\uD83D\uDC41\uFE0F", suited: true, percentage: 89,
         description: "あなたは人間という生き物を深く理解しています。表情の微妙な変化、声のトーン、言葉の裏に隠された本音——その洞察力は小説家にとって最強の武器です。リアリティのあるキャラクターを描かせたら右に出る者はいません。",
         advice: "カフェに座って道行く人を観察する時間を作ってください。それがあなたの最高の取材です。",
         writers: "向田邦子、三浦しをん、レイモンド・カーヴァー", color: "#9B59B6",
-        book: { title: "夜のピクニック", author: "恩田陸", url: "https://www.amazon.co.jp/dp/B009GXMA2U", desc: "繊細な人間観察が光る青春小説。観察眼を持つあなたなら深く共感できるはず。" },
+        book: { title: "ようこそ実力至上主義の教室へ", author: "衣笠彰梧", url: "https://amzn.to/4aF4AOY", desc: "人間の本性を見抜く主人公の頭脳戦。観察力と洞察力で勝負するあなたにぴったりの学園サバイバル。" },
       },
       {
         type: "感情爆発型小説家", emoji: "\uD83D\uDD25", suited: true, percentage: 85,
         description: "あなたの感受性は常人の3倍です。喜怒哀楽が激しく、その溢れ出る感情こそが読者の心を揺さぶる原動力になります。あなたの書く文章には「体温」があり、読者は思わず涙するでしょう。",
         advice: "感情が高ぶった瞬間にすぐ書き始めてください。その生々しさが最大の武器です。",
         writers: "中原中也、よしもとばなな、ドストエフスキー", color: "#E74C3C",
-        book: { title: "キッチン", author: "よしもとばなな", url: "https://www.amazon.co.jp/dp/B009IXG5JU", desc: "感情の機微を繊細に描いた名作。感受性豊かなあなたの心に刺さる一冊。" },
+        book: { title: "Re:ゼロから始める異世界生活", author: "長月達平", url: "https://amzn.to/4cUphYm", desc: "「小説家になろう」発。死に戻りの絶望と希望の中で感情が爆発する主人公は、感受性豊かなあなたの心を揺さぶるはず。" },
       },
       {
         type: "妄想力全開型小説家", emoji: "\uD83C\uDF00", suited: true, percentage: 94,
         description: "あなたの頭の中には無限の宇宙が広がっています。現実と空想の境界が曖昧で、常に「もう一つの世界」に片足を突っ込んでいる状態。ファンタジー、SF、不思議な文学——あなたにしか書けない世界があります。",
         advice: "妄想をノートに書き溜めてください。あなたの脳内世界は、そのまま売れる小説のネタです。",
         writers: "星新一、村上春樹、ガブリエル・ガルシア＝マルケス", color: "#3498DB",
-        book: { title: "ボッコちゃん", author: "星新一", url: "https://www.amazon.co.jp/dp/B009GXMA8Y", desc: "ショートショートの名手。妄想力を物語にする技術が詰まった一冊。" },
+        book: { title: "ダンジョンに出会いを求めるのは間違っているだろうか", author: "大森藤ノ", url: "https://amzn.to/46ooMC3", desc: "緻密な世界設定と壮大なダンジョン世界。妄想力全開のあなたなら、この無限に広がる冒険世界にどっぷり浸れるはず。" },
       },
       {
         type: "潜在能力覚醒待ち型", emoji: "\uD83C\uDF31", suited: false, percentage: 45,
         description: "現時点では小説家の資質はまだ眠っている段階です。しかし安心してください。多くの偉大な作家も、最初は「自分に才能がある」なんて思っていませんでした。あなたに必要なのは、書き始めるきっかけだけです。",
         advice: "まずは1日5分、思ったことを書く習慣から始めてみてください。才能は書くことで目覚めます。",
         writers: "あなたはまだ見ぬ新しいタイプの作家かもしれません", color: "#95A5A6",
-        book: { title: "書くことについて", author: "スティーヴン・キング", url: "https://www.amazon.co.jp/dp/4094087648", desc: "キングが語る創作論。才能の開花を待つあなたへの最高の手引書。" },
+        book: { title: "書くことについて", author: "スティーヴン・キング", url: "https://amzn.to/4aMPAx6", desc: "ホラーの帝王が語る、小説家になるための実践的アドバイス。才能が眠っているあなたの背中を押してくれる一冊。" },
       },
       {
         type: "編集者・批評家タイプ", emoji: "\uD83D\uDCDD", suited: false, percentage: 32,
         description: "あなたの才能は「書く」ことより「見抜く」ことにあります。作品の良し悪しを的確に判断し、改善点を見つけ出す鋭い目を持っています。小説家より編集者やブックレビュアーとして輝くかもしれません。",
         advice: "もし書くなら、まず大量に読んでから。あなたの分析力は、書く経験と掛け合わせると最強です。",
         writers: "批評家として：小林秀雄、柄谷行人", color: "#7F8C8D",
-        book: { title: "読書について", author: "ショウペンハウエル", url: "https://www.amazon.co.jp/dp/4003363221", desc: "「読む」ことの本質を問う名著。分析力に長けたあなたにこそ読んでほしい。" },
+        book: { title: "読書について", author: "ショウペンハウエル", url: "https://amzn.to/4cfGf3f", desc: "「読む」ことの本質を鋭く突いた哲学的名著。作品を見抜く目を持つあなたにこそ響く、読書と思考の極意。" },
       },
     ];
 
@@ -585,45 +580,73 @@
       );
     }
 
-    // ========== 広告スロット ==========
+    // ========== 広告スロット（忍者AdMax） ==========
     function AdSlot(props) {
       var slotId = props.id || 'ad-slot';
+      var adRef = useRef(null);
+
+      useEffect(function() {
+        if (adRef.current && !adRef.current.querySelector('script')) {
+          var script = document.createElement('script');
+          script.src = 'https://adm.shinobi.jp/s/c6b173ffc17937cdca263fb82f900645';
+          script.async = true;
+          adRef.current.appendChild(script);
+        }
+      }, []);
+
       return (
-        <div id={slotId} style={{
+        <div id={slotId} ref={adRef} style={{
           width: '100%', minHeight: '100px', marginBottom: '1.5rem',
-          background: 'rgba(255,255,255,0.02)', borderRadius: '12px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          border: '1px dashed rgba(255,255,255,0.06)', overflow: 'hidden',
-        }}>
-          <span style={{ fontSize: '0.7rem', color: '#333' }}>AD</span>
-        </div>
+          borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          overflow: 'hidden',
+        }} />
       );
     }
 
     // ========== おすすめ書籍（結果に直接紐づけ） ==========
     function BookRecommendation(props) {
       var book = props.book;
-      if (!book) return null;
       return (
-        <a href={book.url} target="_blank" rel="noopener noreferrer nofollow" style={{
-          display: 'block', width: '100%', padding: '1rem 1.2rem', marginBottom: '1.5rem',
-          background: 'rgba(255,255,255,0.04)', borderRadius: '12px', textDecoration: 'none',
-          border: '1px solid rgba(255,255,255,0.08)', transition: 'all 0.2s',
-        }}>
-          <div style={{ fontSize: '0.7rem', color: '#FF6B35', letterSpacing: '2px', marginBottom: '0.5rem', fontWeight: 700 }}>
-            📚 あなたにおすすめの一冊
-          </div>
-          <div style={{ fontSize: '0.95rem', color: '#ddd', marginBottom: '0.3rem' }}>
-            {book.title}
-            <span style={{ fontSize: '0.8rem', color: '#999', marginLeft: '0.5rem' }}>/ {book.author}</span>
-          </div>
-          <div style={{ fontSize: '0.82rem', color: '#aaa', lineHeight: 1.6, marginTop: '0.4rem' }}>
-            {book.desc}
-          </div>
-          <div style={{ fontSize: '0.78rem', color: '#FF6B35', marginTop: '0.5rem' }}>
-            Amazon で見る →
-          </div>
-        </a>
+        <div style={{ width: '100%', marginBottom: '1.5rem' }}>
+          {/* ライトノベルランキング（全結果共通） */}
+          <a href="https://amzn.to/3ZXynMs" target="_blank" rel="noopener noreferrer nofollow" style={{
+            display: 'block', width: '100%', padding: '1rem 1.2rem', marginBottom: '0.8rem',
+            background: 'linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,107,53,0.06))', borderRadius: '12px', textDecoration: 'none',
+            border: '1px solid rgba(255,215,0,0.2)', transition: 'all 0.2s',
+          }}>
+            <div style={{ fontSize: '0.7rem', color: '#FFD700', letterSpacing: '2px', marginBottom: '0.4rem', fontWeight: 700 }}>
+              👑 ライトノベル人気ランキング
+            </div>
+            <div style={{ fontSize: '0.88rem', color: '#ddd', lineHeight: 1.6 }}>
+              今いちばん読まれているライトノベルをチェック！あなたの次の一冊が見つかるかも。
+            </div>
+            <div style={{ fontSize: '0.78rem', color: '#FFD700', marginTop: '0.4rem' }}>
+              ランキングを見る →
+            </div>
+          </a>
+          {/* 個別おすすめ書籍 */}
+          {book && (
+            <a href={book.url} target="_blank" rel="noopener noreferrer nofollow" style={{
+              display: 'block', width: '100%', padding: '1rem 1.2rem',
+              background: 'rgba(255,255,255,0.04)', borderRadius: '12px', textDecoration: 'none',
+              border: '1px solid rgba(255,255,255,0.08)', transition: 'all 0.2s',
+            }}>
+              <div style={{ fontSize: '0.7rem', color: '#FF6B35', letterSpacing: '2px', marginBottom: '0.5rem', fontWeight: 700 }}>
+                📚 あなたにおすすめの一冊
+              </div>
+              <div style={{ fontSize: '0.95rem', color: '#ddd', marginBottom: '0.3rem' }}>
+                {book.title}
+                <span style={{ fontSize: '0.8rem', color: '#999', marginLeft: '0.5rem' }}>/ {book.author}</span>
+              </div>
+              <div style={{ fontSize: '0.82rem', color: '#aaa', lineHeight: 1.6, marginTop: '0.4rem' }}>
+                {book.desc}
+              </div>
+              <div style={{ fontSize: '0.78rem', color: '#FF6B35', marginTop: '0.5rem' }}>
+                Amazon で見る →
+              </div>
+            </a>
+          )}
+        </div>
       );
     }
 
