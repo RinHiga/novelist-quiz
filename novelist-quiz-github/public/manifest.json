@@ -1,9 +1,0 @@
-{
-  "name": "小説家適性診断",
-  "short_name": "小説家診断",
-  "description": "あなたは小説家に向いているか診断",
-  "start_url": "/",
-  "display": "standalone",
-  "background_color": "#0a0a1a",
-  "theme_color": "#0a0a1a"
-}
